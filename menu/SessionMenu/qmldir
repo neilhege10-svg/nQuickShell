@@ -1,0 +1,5 @@
+CenterPanel 1.0 CenterPanel.qml
+SessionControl 1.0 SessionControl.qml
+SessionButton 1.0 SessionButton.qml
+ConfirmControl 1.0 ConfirmControl.qml
+WifiPasswordControl 1.0 WifiPasswordControl.qml
