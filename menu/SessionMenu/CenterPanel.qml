@@ -1,5 +1,6 @@
 import "../../state"
 import "../../theme"
+import "../../assets/animations"
 import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Layouts
@@ -106,14 +107,10 @@ focusable: PanelState.activePage === "wifi-password"
             }
         }
 
-        SequentialAnimation {
+        FlickerAnimation {
             id: flickerAnim
-
-            NumberAnimation { target: contentArea; property: "opacity"; from: 0;   to: 1;   duration: 40 }
-            NumberAnimation { target: contentArea; property: "opacity"; from: 1;   to: 0.2; duration: 50 }
-            NumberAnimation { target: contentArea; property: "opacity"; from: 0.2; to: 0.8; duration: 30 }
-            NumberAnimation { target: contentArea; property: "opacity"; from: 0.8; to: 0.4; duration: 40 }
-            NumberAnimation { target: contentArea; property: "opacity"; from: 0.4; to: 1;   duration: 60 }
+            targetItem: contentArea
+            speedMultiplier: 1
         }
 
         Connections {

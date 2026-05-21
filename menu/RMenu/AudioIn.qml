@@ -23,7 +23,7 @@ ColumnLayout {
         Layout.rightMargin: 10
     }
 
-    HudListMenu {
+    ScrollHudList {
         t: theme
         listModel: AudioService.inputDevices
         activeItem: AudioService.inputNode

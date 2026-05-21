@@ -12,6 +12,25 @@ Item {
 
     implicitWidth: netLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
     implicitHeight: t ? t.pillHeight : 32 // FIXED: Changed theme.pillHeight to t.pillHeight
+    DropShadow {
+        anchors.fill: pill
+        horizontalOffset: 3
+        verticalOffset: 2
+        radius: 8
+        samples: 17
+        color: "#000000"
+        source: pill
+        opacity: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 1 : 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+
+        }
+
+    }
 
     Rectangle {
         id: pill

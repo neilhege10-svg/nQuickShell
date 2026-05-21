@@ -22,7 +22,7 @@ ColumnLayout {
         Layout.rightMargin: 10
     }
 
-    HudListMenu {
+    ScrollHudList {
         t: theme
         listModel: NetworkService.btDevices
         activeItem: NetworkService.btDevices.find((d) => {
