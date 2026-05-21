@@ -261,7 +261,7 @@ PanelWindow {
                 
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 350
+                        duration: 500
                         easing.type: Easing.OutQuad
                     }
                 }
@@ -305,12 +305,8 @@ PanelWindow {
             }
 
             BtnRound {
-                t: theme; icon: "󰎆"; showShadow: true
-                activeState: PanelState.rPanelOpen && PanelState.rPanelPage === "network"
-                onClicked: {
-                    PanelState.rPanelPage = "network";
-                    PanelState.rPanelOpen = true;
-                }
+                t: theme; icon: "󰂚"; showShadow: true
+              
             }
         }
 
