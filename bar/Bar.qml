@@ -142,6 +142,9 @@ PanelWindow {
                 t: theme
             }
 
+            Battery {
+                t: theme
+            }
             Volume {
                 t: theme
             }

@@ -37,6 +37,7 @@ Item {
         anchors.fill: parent
         radius: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? 12 : (t ? t.widgetRadius : 8)
         color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (t ? t.base.accent : "#b4befe") : (t ? t.base.surface : "#313244")
+        scale: mouseArea.pressed ? 0.9 : 1
 
         PwObjectTracker {
             objects: [Pipewire.defaultAudioSink]
@@ -73,20 +74,27 @@ Item {
             Behavior on color {
                 ColorAnimation {
                     duration: 400
+                  }
                 }
 
-            }
-
         }
 
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                PanelState.rPanelOpen = !PanelState.rPanelOpen;
-                PanelState.rPanelPage = "audio";
-            }
+MouseArea {
+    id: mouseArea
+    anchors.fill: parent
+    cursorShape: Qt.PointingHandCursor
+    
+    onClicked: {
+        if (!PanelState.rPanelOpen) {
+            // If the panel is closed, open it and set the page
+            PanelState.rPanelOpen = true;
+            PanelState.rPanelPage = "audio";
+        } else {
+            // If it's already open, just make sure it switches to the audio page
+            PanelState.rPanelPage = "audio";
         }
+    }
+}
 
         Behavior on color {
             ColorAnimation {

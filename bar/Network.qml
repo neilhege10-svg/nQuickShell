@@ -1,7 +1,7 @@
 import Qt5Compat.GraphicalEffects
 import QtQuick
 import Quickshell.Io
-
+import "../state"
 Item {
     id: root
 
@@ -17,8 +17,22 @@ Item {
         id: pill
 
         anchors.fill: parent
-        radius: t ? t.widgetRadius : 8
-        color: t ? t.base.surface : "#313244" // UPGRADED: Namespaced to base.surface [cite: 5]
+        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 12 : (t ? t.widgetRadius : 8)
+        color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.base.accent : "#b4befe") : (t ? t.base.surface : "#313244")
+        scale: mouseArea.pressed ? 0.9 : 1
+                Behavior on color {
+            ColorAnimation {
+                duration: 330
+            }
+
+        }
+
+        Behavior on radius {
+            NumberAnimation {
+                duration: 330
+            }
+
+        }
 
         Process {
             id: netProc
@@ -63,15 +77,36 @@ Item {
 
             anchors.centerIn: parent
             text: root.netIcon + " " + root.netName
-            color: root.t ? root.t.base.text : "#cdd6f4" // UPGRADED: Namespaced to base.text [cite: 17]
+            color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (root.t ? root.t.base.textActive : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
 
             font {
                 pixelSize: root.t ? root.t.fontSize : 13
                 family: root.t ? root.t.fontFamily : ""
             }
+            Behavior on color {
+                ColorAnimation {
+                    duration: 400
+                  }
+                }
 
         }
 
     }
+MouseArea {
+    id: mouseArea
+    anchors.fill: parent
+    cursorShape: Qt.PointingHandCursor
+    
+    onClicked: {
+        if (!PanelState.rPanelOpen) {
+            // If the panel is closed, open it and set the page
+            PanelState.rPanelOpen = true;
+            PanelState.rPanelPage = "network";
+        } else {
+            // If it's already open, just make sure it switches to the network page
+            PanelState.rPanelPage = "network";
+        }
+    }
+}
 
 }
