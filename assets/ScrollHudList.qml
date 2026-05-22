@@ -22,7 +22,12 @@ Item {
     property var onItemClicked: function(modelData) {}
 
     width: 300
-    height: Math.min(listView.count * 40, maxHeight)
+    implicitHeight: Math.min(listView.count * 40, maxHeight)
+    height: implicitHeight
+    // Critical for ColumnLayout parents — without these the layout locks
+    // height at 0 on creation (empty list) and never re-layouts after data loads
+    Layout.preferredWidth: width
+    Layout.preferredHeight: implicitHeight
 
     ListView {
         id: listView
@@ -46,7 +51,8 @@ Item {
             id: delegateItem
 
             readonly property var currentData: modelData
-            property bool isActive: root.activeItem === currentData
+            property bool isActive: root.activeItem === currentData ||
+                                    (root.activeItem && currentData && root.activeItem.name === currentData.name)
 
             width: listView.width
             height: 40
