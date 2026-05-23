@@ -271,7 +271,25 @@ PanelWindow {
                     leftMargin: 60; rightMargin: 10; topMargin: 320; bottomMargin: 320
                 }
             }
+          }
+          Item {
+          id: notifPage
+        
+            anchors.fill: parent
+            visible: PanelState.rPanelPage === "notif"
+
+            NotifControl {
+              t: theme
+                              anchors {
+                    top: parent.top; bottom: parent.bottom; left: parent.left; right: parent.right
+                    leftMargin: 60; rightMargin: 10; topMargin: 320; bottomMargin: 320
+                }
+
+            }
         }
+
+
+
 
         // ── SIDE ACCENT ACTION BUTTONS ───────────────────────────────────
         ColumnLayout {
@@ -306,7 +324,11 @@ PanelWindow {
 
             BtnRound {
                 t: theme; icon: "󰂚"; showShadow: true
-              
+                activeState: PanelState.rPanelOpen && PanelState.rPanelPage === "notif"
+                onClicked: {
+                    PanelState.rPanelPage = "notif";
+                    PanelState.rPanelOpen = true;
+                }
             }
         }
 

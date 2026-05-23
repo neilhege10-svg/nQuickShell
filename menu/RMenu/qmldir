@@ -5,5 +5,4 @@ VolumeControl 1.0 VolumeControl.qml
 NetworkSection 1.0 NetworkSection.qml
 BluetoothSection 1.0 BluetoothSection.qml
 NetworkControl 1.0 NetworkControl.qml
-NetworkHudList 1.0 NetworkHudlist.qml
-BluetoothHudList 1.0 BluetoothHudList.qml
+NotifControl 1.0 NotifControl.qml
