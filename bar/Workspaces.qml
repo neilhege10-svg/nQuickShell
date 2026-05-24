@@ -104,11 +104,12 @@ RowLayout {
 
                 Behavior on width {
                     NumberAnimation {
-                        duration: 400
+                       duration: 600          // Slowed down from 400ms for a smoother stretch
+                       easing.type: Easing.OutElastic 
+                       easing.amplitude: 0.25 // Lowered from 0.4 so the bounce is very subtle
+                       easing.period: 0.4     // Widened the wave period to make the settling motion feel heavier
                     }
-
-                }
-
+                 } 
             }
 
         }

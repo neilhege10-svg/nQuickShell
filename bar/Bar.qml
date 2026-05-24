@@ -39,15 +39,6 @@ PanelWindow {
         height: theme.barHeight
         width: contentLayout.implicitWidth + 700
 
-        DropShadow {
-            anchors.fill: dockBg
-            horizontalOffset: 0
-            verticalOffset: 0
-            radius: 9
-            samples: 17
-            color: "#000000"
-            source: dockBg
-        }
 
         Shape {
             id: dockBg
@@ -58,8 +49,8 @@ PanelWindow {
 
             ShapePath {
                 fillColor: theme.base.bg // UPGRADED: Explicitly uses namespaced base UI background
-                strokeColor: "transparent"
-                strokeWidth: 1
+                strokeColor: theme.base.border
+                strokeWidth: 2
                 startX: 0
                 startY: 0
 
@@ -97,7 +88,12 @@ PanelWindow {
                     y: 0
                 }
 
+              }
+                          layer.effect: DropShadow {
+                horizontalOffset: 0; verticalOffset: 0; radius: 10; samples: 17
+                color: theme.base.shadow
             }
+
 
         }
 
@@ -159,6 +155,8 @@ PanelWindow {
             t: theme
             icon: ""
             showShadow: true
+            isHolo: false
+            hasBorder: true
 
             anchors {
                 left: contentLayout.right
@@ -171,7 +169,8 @@ PanelWindow {
         BtnRound {
             t: theme
             icon: "⏻"
-            showShadow: true
+            isHolo: false
+            hasBorder: true
             activeState: PanelState.cPanelOpen
             onClicked: PanelState.cPanelOpen = !PanelState.cPanelOpen
 
