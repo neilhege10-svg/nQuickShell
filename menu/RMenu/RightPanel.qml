@@ -501,13 +501,35 @@ PanelWindow {
             }
 
         }
-
+        // ── NOTIFICATION PAGE ─────────────────────────────────────────────────
         Item {
             id: notifPage
 
             anchors.fill: parent
             visible: PanelState.rPanelPage === "notif"
 
+                          Item {
+                id: notifGlitchGroup
+
+                anchors.fill: parent
+
+                NotifSection {
+                    id: notifSection
+
+                    t: theme
+
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: 10
+                        rightMargin: 10
+                        topMargin: 10
+                        bottomMargin: 495
+                    }
+                 }
+              }
             NotifControl {
                 t: theme
 

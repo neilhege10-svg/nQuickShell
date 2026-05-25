@@ -6,3 +6,4 @@ NetworkSection 1.0 NetworkSection.qml
 BluetoothSection 1.0 BluetoothSection.qml
 NetworkControl 1.0 NetworkControl.qml
 NotifControl 1.0 NotifControl.qml
+NotifSection 1.0 NotifSection.qml
