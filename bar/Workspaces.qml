@@ -63,7 +63,7 @@ RowLayout {
                 id: button
 
                 width: isActive ? 50 : 20
-                height: isActive ? 24 : 18
+                height: isActive ? t.pillHeight : 18
                 radius: 14
                 color: isActive ? (root.t ? root.t.base.accent : "#cba6f7") : (root.t ? root.t.base.surface : "#191926")
 

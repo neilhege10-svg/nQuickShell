@@ -12,9 +12,9 @@ QtObject {
     readonly property int fontSize: 13
     readonly property int spacing: 7
     readonly property color shadow: "#40000000"
-    readonly property int barHeight: 35
+    readonly property int barHeight: 36
     readonly property int barPadding: 6
-    readonly property int pillHeight: 25
+    readonly property int pillHeight: 20
     readonly property int btnHeight: 30
     readonly property int widgetPadding: 10
     readonly property int widgetRadius: 8
@@ -30,7 +30,7 @@ QtObject {
         readonly property color textActive: "#e6e6e6"
         readonly property color accent: "#03cffc"
         readonly property color border: "#4096bfff"
-        readonly property color shadow: "#4d000000"
+        readonly property color shadow: "#4d010101"
         readonly property color altbg: "#4d171b26" // Your moved RightPanel BG
     }
 

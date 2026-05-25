@@ -1,7 +1,8 @@
+import "../state"
 import Qt5Compat.GraphicalEffects
 import QtQuick
 import Quickshell.Io
-import "../state"
+
 Item {
     id: root
 
@@ -12,6 +13,7 @@ Item {
 
     implicitWidth: netLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
     implicitHeight: t ? t.pillHeight : 32 // FIXED: Changed theme.pillHeight to t.pillHeight
+
     DropShadow {
         anchors.fill: pill
         horizontalOffset: 3
@@ -39,19 +41,6 @@ Item {
         radius: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 12 : (t ? t.widgetRadius : 8)
         color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.base.accent : "#b4befe") : (t ? t.base.surface : "#313244")
         scale: mouseArea.pressed ? 0.9 : 1
-                Behavior on color {
-            ColorAnimation {
-                duration: 330
-            }
-
-        }
-
-        Behavior on radius {
-            NumberAnimation {
-                duration: 330
-            }
-
-        }
 
         Process {
             id: netProc
@@ -102,30 +91,47 @@ Item {
                 pixelSize: root.t ? root.t.fontSize : 13
                 family: root.t ? root.t.fontFamily : ""
             }
+
             Behavior on color {
                 ColorAnimation {
                     duration: 400
-                  }
                 }
 
+            }
+
+        }
+
+        Behavior on color {
+            ColorAnimation {
+                duration: 330
+            }
+
+        }
+
+        Behavior on radius {
+            NumberAnimation {
+                duration: 330
+            }
+
         }
 
     }
-MouseArea {
-    id: mouseArea
-    anchors.fill: parent
-    cursorShape: Qt.PointingHandCursor
-    
-    onClicked: {
-        if (!PanelState.rPanelOpen) {
-            // If the panel is closed, open it and set the page
-            PanelState.rPanelOpen = true;
-            PanelState.rPanelPage = "network";
-        } else {
-            // If it's already open, just make sure it switches to the network page
-            PanelState.rPanelPage = "network";
+
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+        onClicked: {
+            if (!PanelState.rPanelOpen) {
+                // If the panel is closed, open it and set the page
+                PanelState.rPanelOpen = true;
+                PanelState.rPanelPage = "network";
+            } else {
+                // If it's already open, just make sure it switches to the network page
+                PanelState.rPanelPage = "network";
+            }
         }
     }
-}
 
 }

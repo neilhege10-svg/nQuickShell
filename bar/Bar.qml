@@ -50,8 +50,6 @@ PanelWindow {
                 fillColor: theme.base.bg
                 strokeColor: theme.base.border
                 strokeWidth: 1
-                joinStyle: ShapePath.MiterJoin // Guarantees razor-sharp corner math
-                // Pushes the top line 2 pixels down into the safety zone
                 startX: 0
                 startY: 2
 
