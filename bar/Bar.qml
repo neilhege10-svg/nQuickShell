@@ -18,7 +18,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "bar" // Tells Hyprland this is a bar, preventing dimaround quirks
     WlrLayershell.exclusiveZone: theme.barHeight
-    implicitHeight: theme.barHeight + 12
+    implicitHeight: theme.barHeight + 40
     color: "transparent"
 
     WlrLayershell.anchors {
@@ -39,61 +39,71 @@ PanelWindow {
         height: theme.barHeight
         width: contentLayout.implicitWidth + 700
 
-
         Shape {
             id: dockBg
 
             layer.enabled: true
             layer.samples: 6
-            anchors.fill: parent
+            anchors.fill: parent // Keep full size
 
             ShapePath {
-                fillColor: theme.base.bg // UPGRADED: Explicitly uses namespaced base UI background
+                fillColor: theme.base.bg
                 strokeColor: theme.base.border
-                strokeWidth: 2
+                strokeWidth: 1
+                joinStyle: ShapePath.MiterJoin // Guarantees razor-sharp corner math
+                // Pushes the top line 2 pixels down into the safety zone
                 startX: 0
-                startY: 0
+                startY: 2
 
+                // Top Line
                 PathLine {
                     x: dockBg.width
-                    y: 0
+                    y: 2
                 }
 
+                // Right Slope
                 PathLine {
                     x: dockBg.width - 12
-                    y: dockBg.height - 3
+                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
                 }
 
+                // Right Arc
                 PathArc {
                     x: dockBg.width - 15
-                    y: dockBg.height
-                    radiusX: 33
-                    radiusY: 30
+                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
+                    radiusX: 18
+                    radiusY: 18
                 }
 
+                // Flat Bottom Line
                 PathLine {
                     x: 15
-                    y: dockBg.height
+                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
                 }
 
+                // Left Arc
                 PathArc {
                     x: 12
-                    y: dockBg.height - 3
-                    radiusX: 33
-                    radiusY: 30
+                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
+                    radiusX: 18
+                    radiusY: 18
                 }
 
+                // Left Slope back to start
                 PathLine {
                     x: 0
-                    y: 0
+                    y: 2
                 }
 
-              }
-                          layer.effect: DropShadow {
-                horizontalOffset: 0; verticalOffset: 0; radius: 10; samples: 17
-                color: theme.base.shadow
             }
 
+            layer.effect: DropShadow {
+                horizontalOffset: 3
+                verticalOffset: 2
+                radius: 10
+                samples: 17
+                color: theme.base.shadow
+            }
 
         }
 
@@ -120,8 +130,8 @@ PanelWindow {
                 fill: parent
                 leftMargin: 20
                 rightMargin: 20
-                topMargin: 2
-                bottomMargin: 2
+                topMargin: 4
+                bottomMargin: 4
             }
 
             Workspaces {
@@ -141,6 +151,7 @@ PanelWindow {
             Battery {
                 t: theme
             }
+
             Volume {
                 t: theme
             }
@@ -154,9 +165,8 @@ PanelWindow {
         BtnRound {
             t: theme
             icon: ""
-            showShadow: true
-            isHolo: false
             hasBorder: true
+            showShadow: true
 
             anchors {
                 left: contentLayout.right
@@ -169,8 +179,8 @@ PanelWindow {
         BtnRound {
             t: theme
             icon: "⏻"
-            isHolo: false
             hasBorder: true
+            showShadow: true
             activeState: PanelState.cPanelOpen
             onClicked: PanelState.cPanelOpen = !PanelState.cPanelOpen
 
