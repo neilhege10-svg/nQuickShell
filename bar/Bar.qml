@@ -44,53 +44,54 @@ PanelWindow {
 
             layer.enabled: true
             layer.samples: 6
-            anchors.fill: parent // Keep full size
+            anchors.fill: parent
 
             ShapePath {
                 fillColor: theme.base.bg
                 strokeColor: theme.base.border
-                strokeWidth: 1
+                strokeWidth: 0
                 startX: 0
-                startY: 2
+                startY: 0
 
-                // Top Line
+                // 1. Top Line
                 PathLine {
                     x: dockBg.width
-                    y: 2
+                    y: 0
                 }
 
-                // Right Slope
+                // 2. Right Slope (Stops just above the turn)
                 PathLine {
-                    x: dockBg.width - 12
-                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
+                    x: dockBg.width - 10
+                    y: dockBg.height - 10
                 }
 
-                // Right Arc
-                PathArc {
-                    x: dockBg.width - 15
-                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
-                    radiusX: 18
-                    radiusY: 18
+                // 3. Seamless Right Curve (Bézier Curve)
+                // Uses the theoretical "sharp" corner as a magnet to pull the curve smoothly
+                PathQuad {
+                    controlX: dockBg.width - 14
+                    controlY: dockBg.height - 2
+                    x: dockBg.width - 22
+                    y: dockBg.height - 2
                 }
 
-                // Flat Bottom Line
+                // 4. Flat Bottom Line
                 PathLine {
-                    x: 15
-                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
+                    x: 22
+                    y: dockBg.height - 2
                 }
 
-                // Left Arc
-                PathArc {
-                    x: 12
-                    y: dockBg.height - 2 // Pushes 2 pixels up from the hard bottom edge
-                    radiusX: 18
-                    radiusY: 18
+                // 5. Seamless Left Curve (Bézier Curve)
+                PathQuad {
+                    controlX: 14
+                    controlY: dockBg.height - 2
+                    x: 10
+                    y: dockBg.height - 10
                 }
 
-                // Left Slope back to start
+                // 6. Left Slope back to start
                 PathLine {
                     x: 0
-                    y: 2
+                    y: 0
                 }
 
             }
@@ -126,10 +127,10 @@ PanelWindow {
 
             anchors {
                 fill: parent
-                leftMargin: 20
-                rightMargin: 20
-                topMargin: 4
-                bottomMargin: 4
+                leftMargin: 18
+                rightMargin: 18
+                topMargin: 2
+                bottomMargin: 2
             }
 
             Workspaces {
