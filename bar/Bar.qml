@@ -37,7 +37,7 @@ PanelWindow {
 
         anchors.horizontalCenter: parent.horizontalCenter
         height: theme.barHeight - 2
-        width: contentLayout.implicitWidth + 700
+        width: contentLayout.implicitWidth + 800
 
         Shape {
             id: dockBg
