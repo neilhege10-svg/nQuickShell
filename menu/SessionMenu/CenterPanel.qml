@@ -1,6 +1,6 @@
+import "../../assets/animations"
 import "../../state"
 import "../../theme"
-import "../../assets/animations"
 import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Layouts
@@ -20,13 +20,13 @@ PanelWindow {
     implicitHeight: theme.barHeight + menuShape.menuHeight + 20
     color: "transparent"
     visible: PanelState.cPanelOpen || menuShape.openAmount > 0
-focusable: PanelState.activePage === "wifi-password"
+    focusable: PanelState.activePage === "wifi-password"
     onVisibleChanged: {
         if (!visible) {
-            PanelState.activePage = "session"
-            PanelState.pendingAction = ""
-            PanelState.pendingCmd = ""
-            PanelState.wifiTarget = null   // ← clear wifi target on close
+            PanelState.activePage = "session";
+            PanelState.pendingAction = "";
+            PanelState.pendingCmd = "";
+            PanelState.wifiTarget = null; // ← clear wifi target on close
         }
     }
 
@@ -41,11 +41,14 @@ focusable: PanelState.activePage === "wifi-password"
         anchors.fill: parent
         onClicked: {
             if (!menuShape.contains(menuShape.mapFromItem(parent, mouseX, mouseY)))
-                PanelState.cPanelOpen = false
+                PanelState.cPanelOpen = false;
+
         }
     }
 
-    Theme { id: theme }
+    Theme {
+        id: theme
+    }
 
     Item {
         id: menuShape
@@ -56,7 +59,7 @@ focusable: PanelState.activePage === "wifi-password"
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: theme.barHeight
+        anchors.topMargin: theme.barHeight - 4
         width: menuWidth
         height: menuHeight
 
@@ -74,28 +77,40 @@ focusable: PanelState.activePage === "wifi-password"
                 startX: 0
                 startY: 0
 
-                PathLine { x: shapeBg.width; y: 0 }
+                PathLine {
+                    x: shapeBg.width
+                    y: 0
+                }
+
                 PathLine {
                     x: shapeBg.width - 50 * menuShape.openAmount
                     y: 0 + (shapeBg.height - 80) * menuShape.openAmount
                 }
+
                 PathArc {
                     x: shapeBg.width - 54 * menuShape.openAmount
                     y: 0 + (shapeBg.height - 77) * menuShape.openAmount
                     radiusX: 15 * menuShape.openAmount
                     radiusY: 15 * menuShape.openAmount
                 }
+
                 PathLine {
                     x: 54 * menuShape.openAmount
                     y: 0 + (shapeBg.height - 77) * menuShape.openAmount
                 }
+
                 PathArc {
                     x: 50 * menuShape.openAmount
                     y: 0 + (shapeBg.height - 80) * menuShape.openAmount
                     radiusX: 15 * menuShape.openAmount
                     radiusY: 15 * menuShape.openAmount
                 }
-                PathLine { x: 0; y: 0 }
+
+                PathLine {
+                    x: 0
+                    y: 0
+                }
+
             }
 
             layer.effect: DropShadow {
@@ -105,32 +120,36 @@ focusable: PanelState.activePage === "wifi-password"
                 samples: 31
                 color: theme.holo.shadow
             }
+
         }
 
         FlickerAnimation {
             id: flickerAnim
+
             targetItem: contentArea
             speedMultiplier: 1
         }
 
         Connections {
-            target: PanelState
             function onCPanelOpenChanged() {
                 if (!PanelState.cPanelOpen) {
-                    flickerAnim.stop()
-                    contentArea.opacity = 0
+                    flickerAnim.stop();
+                    contentArea.opacity = 0;
                 }
             }
+
+            target: PanelState
         }
 
         Connections {
-            target: menuShape
             function onOpenAmountChanged() {
                 if (menuShape.openAmount > 0.6 && PanelState.cPanelOpen && !flickerAnim.running) {
-                    contentArea.opacity = 0
-                    flickerAnim.restart()
+                    contentArea.opacity = 0;
+                    flickerAnim.restart();
                 }
             }
+
+            target: menuShape
         }
 
         Item {
@@ -147,7 +166,14 @@ focusable: PanelState.activePage === "wifi-password"
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: PanelState.activePage === "session" && menuShape.openAmount > 0.9
                 opacity: PanelState.activePage === "session" ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 300 } }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 300
+                    }
+
+                }
+
             }
 
             // ── CONFIRM PAGE ─────────────────────────────────────────
@@ -156,22 +182,43 @@ focusable: PanelState.activePage === "wifi-password"
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: PanelState.activePage === "confirm"
                 opacity: PanelState.activePage === "confirm" ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 300 } }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 300
+                    }
+
+                }
+
             }
 
             // ── WIFI PASSWORD PAGE ───────────────────────────────────
             WifiPasswordControl {
                 t: theme
                 anchors.horizontalCenter: parent.horizontalCenter
-                y : 12
+                y: 12
                 visible: PanelState.activePage === "wifi-password"
                 opacity: PanelState.activePage === "wifi-password" ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 300 } }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 300
+                    }
+
+                }
+
             }
+
         }
 
         Behavior on openAmount {
-            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation {
+                duration: 500
+                easing.type: Easing.OutCubic
+            }
+
         }
+
     }
+
 }

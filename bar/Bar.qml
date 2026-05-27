@@ -36,60 +36,97 @@ PanelWindow {
         id: dockContainer
 
         anchors.horizontalCenter: parent.horizontalCenter
-        height: theme.barHeight
+        height: theme.barHeight - 2
         width: contentLayout.implicitWidth + 700
 
         Shape {
             id: dockBg
 
             layer.enabled: true
-            layer.samples: 6
+            layer.samples: 8
             anchors.fill: parent
 
             ShapePath {
+                // === RIGHT WING EXTRA ===
+                // === SMOOTH S-CURVE TRANSITION (RIGHT SIDE) ===
+                // === MAIN BAR BOTTOM ===
+                // === SMOOTH S-CURVE TRANSITION (LEFT SIDE - PERFECTLY MIRRORED) ===
+                // === LEFT WING EXTRA (PERFECTLY MIRRORED) ===
+
                 fillColor: theme.base.bg
-                strokeColor: theme.base.border
+                strokeColor: theme.holo.border
                 strokeWidth: 0
                 startX: 0
                 startY: 0
 
-                // 1. Top Line
+                // 1. Top Line - Spans completely flat across the top edge
                 PathLine {
                     x: dockBg.width
                     y: 0
                 }
 
-                // 2. Right Slope (Stops just above the turn)
-                PathLine {
-                    x: dockBg.width - 10
-                    y: dockBg.height - 10
+                // 2. Your tweaked initial curve down
+                PathQuad {
+                    controlX: dockBg.width
+                    controlY: 0
+                    x: dockBg.width - 18
+                    y: 2
                 }
 
-                // 3. Seamless Right Curve (Bézier Curve)
-                // Uses the theoretical "sharp" corner as a magnet to pull the curve smoothly
+                // 3. Your tweaked brief runway slope
+                PathLine {
+                    x: dockBg.width - 24
+                    y: 4
+                }
+
+                // 4. Your custom wide curved connector down to the slope
                 PathQuad {
-                    controlX: dockBg.width - 14
+                    controlX: dockBg.width - 28
+                    controlY: 6
+                    x: dockBg.width - 38
+                    y: dockBg.height - 14
+                }
+
+                // 5. Your custom Seamless Right Curve (Main bottom corner)
+                PathQuad {
+                    controlX: dockBg.width - 45
                     controlY: dockBg.height - 2
-                    x: dockBg.width - 22
+                    x: dockBg.width - 58
                     y: dockBg.height - 2
                 }
 
-                // 4. Flat Bottom Line
+                // 6. Flat Bottom Line (Perfect seamless link: right lands at width-54, left starts at 54)
                 PathLine {
-                    x: 22
+                    x: 58
                     y: dockBg.height - 2
                 }
 
-                // 5. Seamless Left Curve (Bézier Curve)
+                // 7. Mirrored Main bottom corner (Mirrors step 5 perfectly)
                 PathQuad {
-                    controlX: 14
+                    controlX: 45
                     controlY: dockBg.height - 2
-                    x: 10
-                    y: dockBg.height - 10
+                    x: 38
+                    y: dockBg.height - 14
                 }
 
-                // 6. Left Slope back to start
+                // 8. Mirrored custom upper curved connector (Mirrors step 4 perfectly)
+                PathQuad {
+                    controlX: 28
+                    controlY: 6
+                    x: 24
+                    y: 4
+                }
+
+                // 9. Mirrored runway slope segment (Mirrors step 3 perfectly)
                 PathLine {
+                    x: 18
+                    y: 2
+                }
+
+                // 10. Mirrored initial curve back up to meet (0,0) (Mirrors step 2 perfectly)
+                PathQuad {
+                    controlX: 0
+                    controlY: 0
                     x: 0
                     y: 0
                 }
@@ -97,9 +134,9 @@ PanelWindow {
             }
 
             layer.effect: DropShadow {
-                horizontalOffset: 3
-                verticalOffset: 2
-                radius: 10
+                horizontalOffset: o
+                verticalOffset: 4
+                radius: 12
                 samples: 17
                 color: theme.base.shadow
             }
@@ -127,8 +164,8 @@ PanelWindow {
 
             anchors {
                 fill: parent
-                leftMargin: 18
-                rightMargin: 18
+                leftMargin: 48
+                rightMargin: 48
                 topMargin: 2
                 bottomMargin: 2
             }
@@ -166,11 +203,13 @@ PanelWindow {
             icon: ""
             hasBorder: true
             showShadow: true
+            scale: 0.82
 
             anchors {
                 left: contentLayout.right
-                verticalCenter: contentLayout.verticalCenter
-                leftMargin: 23
+                top: contentLayout.top
+                topMargin: 1
+                leftMargin: 17
             }
 
         }
@@ -182,11 +221,13 @@ PanelWindow {
             showShadow: true
             activeState: PanelState.cPanelOpen
             onClicked: PanelState.cPanelOpen = !PanelState.cPanelOpen
+            scale: 0.82
 
             anchors {
                 right: contentLayout.left
-                verticalCenter: contentLayout.verticalCenter
-                rightMargin: 23
+                top: contentLayout.top
+                topMargin: 1
+                rightMargin: 17
             }
 
         }
