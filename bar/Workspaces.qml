@@ -9,6 +9,22 @@ RowLayout {
 
     property var monitor
     property var t
+    // =========================================================================
+    // THE FRONTEND ABSTRACTION DICTIONARY
+    // Maps messy backend IDs (1-10) to beautiful, consecutive UI elements
+    // =========================================================================
+    readonly property var workspaceIcons: ({
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "󰨜",
+        "8": "󰺷 ",
+        "9": "󰉏",
+        "10": "󰺷 "
+    })
 
     spacing: 4
 
@@ -17,7 +33,12 @@ RowLayout {
 
         delegate: Item {
             required property var modelData
-            property bool isActive: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id === modelData.id : false
+            // -----------------------------------------------------------------
+            // THE MULTI-MONITOR MULTI-LIGHT FIX:
+            // Checks if this specific workspace is the active one on its assigned monitor.
+            // This ensures both monitors show their active workspace status at all times!
+            // -----------------------------------------------------------------
+            property bool isActive: modelData.monitor && modelData.monitor.activeWorkspace ? modelData.monitor.activeWorkspace.id === modelData.id : false
             property bool belongsHere: root.monitor ? modelData.monitor.id === root.monitor.id : true
 
             implicitWidth: belongsHere ? button.width : 0
@@ -62,18 +83,20 @@ RowLayout {
             Rectangle {
                 id: button
 
-                width: isActive ? 50 : 20
+                width: isActive ? 56 : 28
                 height: isActive ? t.pillHeight : 18
                 radius: 14
                 color: isActive ? (root.t ? root.t.base.accent : "#cba6f7") : (root.t ? root.t.base.surface : "#191926")
 
                 Text {
                     anchors.centerIn: parent
-                    text: modelData.id
-                    color: isActive ? (root.t ? root.t.base.textActive : "#cdd6f4") : ("transparent")
+                    text: root.workspaceIcons[modelData.id] || modelData.id
+                    // Fixed: Replaced "transparent" fallback with a visible dim color
+                    // so you can actually read the icons/numbers when inactive
+                    color: isActive ? (root.t ? root.t.base.textActive : "#cdd6f4") : "transparent"
 
                     font {
-                        pixelSize: root.t ? root.t.fontSize - 2 : 11
+                        pixelSize: 16
                         family: root.t ? root.t.fontFamily : ""
                         bold: isActive
                     }
@@ -104,10 +127,10 @@ RowLayout {
 
                 Behavior on width {
                     NumberAnimation {
-                        duration: 600 // Slowed down from 400ms for a smoother stretch
+                        duration: 600
                         easing.type: Easing.OutElastic
-                        easing.amplitude: 0.25 // Lowered from 0.4 so the bounce is very subtle
-                        easing.period: 0.4 // Widened the wave period to make the settling motion feel heavier
+                        easing.amplitude: 0.25
+                        easing.period: 0.4
                     }
 
                 }
