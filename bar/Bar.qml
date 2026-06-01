@@ -18,7 +18,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "bar" // Tells Hyprland this is a bar, preventing dimaround quirks
     WlrLayershell.exclusiveZone: theme.barHeight
-    implicitHeight: theme.barHeight + 40
+    implicitHeight: theme.barHeight + 10
     color: "transparent"
 
     WlrLayershell.anchors {
