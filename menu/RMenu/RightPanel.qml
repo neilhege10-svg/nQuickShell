@@ -546,6 +546,20 @@ PanelWindow {
 
             }
 
+            ClipboardSection {
+                t: theme
+
+                anchors {
+                   top: parent.top
+                   bottom: parent.bottom
+                   left: parent.left
+                   right: parent.right
+                   leftMargin: 10
+                   rightMargin: 10
+                   topMargin: 495
+                   bottomMargin: 10
+               }
+            }
         }
 
         // ── SIDE ACCENT ACTION BUTTONS ───────────────────────────────────

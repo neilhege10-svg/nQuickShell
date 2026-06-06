@@ -1,3 +1,4 @@
+
 import "../../assets"
 import "../../theme"
 import QtQuick
@@ -7,16 +8,11 @@ ColumnLayout {
     id: root
 
     property var t
-    property var notifications: [{
-        "app": "Discord",
-        "message": "Someone sent a message"
-    }, {
-        "app": "Firefox",
-        "message": "Download complete"
-    }, {
-        "app": "System",
-        "message": "Update available"
-    }]
+property var clips: [
+    "192.168.1.14",
+    "npm run dev",
+    "neil@gmail.com"
+]
 
     spacing: 4
 
@@ -27,14 +23,14 @@ ColumnLayout {
 
     HudListHeader {
         t: root.t
-        title: "NOTIFS"
+        title: "CLIPBOARD"
         accentColor: t.holo.text
         Layout.leftMargin: 10
         Layout.rightMargin: 10
     }
 
     Repeater {
-        model: parent.notifications
+        model: parent.clips
 
         delegate: Item {
             width: parent.width
@@ -47,21 +43,13 @@ ColumnLayout {
                 spacing: 3
 
                 Text {
-                    text: modelData.app
+                    text: modelData
                     color: t.base.text
                     font.family: t.fontFamily
                     font.pixelSize: t.fontSize + 3
+                    elide: Text.ElideRight
                     font.bold: true
                 }
-
-                Text {
-                    text: modelData.message
-                    font.family: t.fontFamily
-                    font.pixelSize: t.fontSize
-                    elide: Text.ElideRight
-                    color: t.base.textActive
-                }
-
             }
 
         }
