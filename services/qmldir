@@ -1,2 +1,3 @@
 singleton AudioService 1.0 AudioService.qml
 singleton NetworkService 1.0 NetworkService.qml
+singleton NotifService 1.0 NotifService.qml
