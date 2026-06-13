@@ -6,16 +6,18 @@ import QtQuick.Layouts
 
 Item {
     id: root
+
     property var t
 
     ColumnLayout {
+        spacing: 4
+
         anchors {
             top: parent.top
             left: parent.left
             right: parent.right
             margins: 15
         }
-        spacing: 4
 
         HudListHeader {
             t: root.t
@@ -25,17 +27,28 @@ Item {
             Layout.rightMargin: 10
         }
 
-        Repeater {
+        ListView {
             model: NotifService.notifications
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.min(contentHeight, 250)
+            clip: true
+            spacing: 4
+
             delegate: Item {
                 width: parent.width
-                height: 50
+                height: Math.max(65, notifContentLayout.implicitHeight + 20)
 
-                Column {
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 12
+                ColumnLayout {
+                    id: notifContentLayout
+
                     spacing: 3
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: 12
+                    }
 
                     Text {
                         text: modelData.summary
@@ -43,6 +56,7 @@ Item {
                         font.family: root.t.fontFamily
                         font.pixelSize: root.t.fontSize + 3
                         font.bold: true
+                        Layout.fillWidth: true
                     }
 
                     Text {
@@ -52,7 +66,11 @@ Item {
                         elide: Text.ElideRight
                         width: root.width - 40
                         color: root.t.base.textActive
+                        Layout.fillWidth: true
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 3
                     }
+
                 }
 
                 Rectangle {
@@ -61,7 +79,11 @@ Item {
                     height: 1
                     color: Qt.rgba(root.t.holo.text.r, root.t.holo.text.g, root.t.holo.text.b, 0.06)
                 }
+
             }
+
         }
+
     }
+
 }
