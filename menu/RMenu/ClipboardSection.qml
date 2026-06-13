@@ -1,5 +1,5 @@
-
 import "../../assets"
+import "../../services"
 import "../../theme"
 import QtQuick
 import QtQuick.Layouts
@@ -8,11 +8,6 @@ ColumnLayout {
     id: root
 
     property var t
-property var clips: [
-    "192.168.1.14",
-    "npm run dev",
-    "neil@gmail.com"
-]
 
     spacing: 4
 
@@ -29,27 +24,48 @@ property var clips: [
         Layout.rightMargin: 10
     }
 
-    Repeater {
-        model: parent.clips
+    ListView {
+        model: ClipboardService.clips
+        Layout.fillWidth: true
+        Layout.preferredHeight: Math.min(contentHeight, 250)
+        clip: true
+        spacing: 4
 
         delegate: Item {
             width: parent.width
-            height: 50
+            height: Math.max(65, clipContentLayout.implicitHeight + 20)
 
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 12
+            ColumnLayout {
+                id: clipContentLayout
+
                 spacing: 3
 
-                Text {
-                    text: modelData
-                    color: t.base.text
-                    font.family: t.fontFamily
-                    font.pixelSize: t.fontSize + 3
-                    elide: Text.ElideRight
-                    font.bold: true
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: 12
                 }
+
+                Text {
+                    text: modelData.text
+                    font.family: root.t.fontFamily
+                    font.pixelSize: root.t.fontSize
+                    elide: Text.ElideRight
+                    width: root.width - 40
+                    color: root.t.base.textActive
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 3
+                }
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    width: parent.width
+                    height: 1
+                    color: Qt.rgba(root.t.holo.text.r, root.t.holo.text.g, root.t.holo.text.b, 0.06)
+                }
+
             }
 
         }
