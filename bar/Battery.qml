@@ -5,17 +5,23 @@ import Quickshell.Io
 Item {
     id: root
 
-    // ── CORE PROPERTIES ──────────────────────────────────
+// ── CORE PROPERTIES ──────────────────────────────────
     property var t
     property bool hasBattery: false
     property string batPct: "0"
     property string batStatus: ""
 
-    // MAGIC HAPPENS HERE: If no battery is found, collapse width/height to 0 and hide it
+//-----------------------------------------------------------------------------------
+// this Section makes it so that the BATTERY module collapses if the system detects
+// that there is no battery in the system.
+//-----------------------------------------------------------------------------------
     implicitWidth: hasBattery ? (statsLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)) : 0
     implicitHeight: hasBattery ? (t ? t.pillHeight : 32) : 0
     visible: hasBattery
 
+//-----------------------------------------------------------------------------------
+// Main Shape and design of the battery pill
+//-----------------------------------------------------------------------------------
     Rectangle {
         id: pill
 
@@ -23,6 +29,9 @@ Item {
         radius: t ? t.widgetRadius : 8
         color: t ? t.base.surface : "#313244"
 
+//-----------------------------------------------------------------------------------
+// Main processes and core logic
+//-----------------------------------------------------------------------------------
         Process {
             id: batProc
 
@@ -54,6 +63,9 @@ Item {
             }
         }
 
+//-----------------------------------------------------------------------------------
+// Text Design and stuff
+//-----------------------------------------------------------------------------------
         Text {
             id: statsLabel
 

@@ -6,14 +6,21 @@ import Quickshell.Io
 Item {
     id: root
 
-    // ── CORE PROPERTIES ──────────────────────────────────
+// ── CORE PROPERTIES ──────────────────────────────────
     property var t
     property string netIcon: "󰤨"
     property string netName: "..."
 
+//-----------------------------------------------------------------------------------
+// Tell the Bar's RowLayout exactly how much space this module needs
+//-----------------------------------------------------------------------------------
     implicitWidth: netLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
     implicitHeight: t ? t.pillHeight : 32 // FIXED: Changed theme.pillHeight to t.pillHeight
 
+//-----------------------------------------------------------------------------------
+// this is the Glow effect, it activates when the module is clicked
+// by using PanelState in the opacity
+//-----------------------------------------------------------------------------------
     DropShadow {
         anchors.fill: pill
         horizontalOffset: 3
@@ -24,6 +31,7 @@ Item {
         source: pill
         opacity: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 1 : 0
 
+        // animation for the shadow on the module
         Behavior on opacity {
             NumberAnimation {
                 duration: 200
@@ -34,6 +42,9 @@ Item {
 
     }
 
+//-----------------------------------------------------------------------------------
+// Main shape and design of the Network module
+//-----------------------------------------------------------------------------------
     Rectangle {
         id: pill
 
@@ -41,7 +52,10 @@ Item {
         radius: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 12 : (t ? t.widgetRadius : 8)
         color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.base.accent : "#b4befe") : (t ? t.base.surface : "#313244")
         scale: mouseArea.pressed ? 0.9 : 1
-
+        
+//-----------------------------------------------------------------------------------
+// Main Process of the Network module
+//-----------------------------------------------------------------------------------
         Process {
             id: netProc
 
@@ -52,18 +66,18 @@ Item {
                 onRead: (data) => {
                     var parts = data.trim().split(":");
                     if (parts.length < 3) {
-                        root.netIcon = "󰖪"; // disconnected [cite: 7, 8]
+                        root.netIcon = "󰖪";
                         root.netName = "Off";
                         return ;
                     }
                     var type = parts[1];
                     var name = parts[0];
                     if (type === "802-11-wireless") {
-                        root.netIcon = "󰤨"; // wifi icon [cite: 10, 11]
-                        root.netName = name.split(" "); // first word only [cite: 11, 12]
+                        root.netIcon = "󰤨";
+                        root.netName = name.split(" ");
                     } else if (type === "802-3-ethernet") {
-                        root.netIcon = "󰈀"; // ethernet icon [cite: 12, 13]
-                        root.netName = "LAN"; // just say LAN [cite: 13, 14]
+                        root.netIcon = "󰈀"; 
+                        root.netName = "LAN"; 
                     } else {
                         root.netIcon = "󰤨";
                         root.netName = name.split(" ");
@@ -80,6 +94,9 @@ Item {
             onTriggered: netProc.running = true
         }
 
+//-----------------------------------------------------------------------------------
+// Main Text design of the Network module
+//-----------------------------------------------------------------------------------
         Text {
             id: netLabel
 
@@ -101,6 +118,7 @@ Item {
 
         }
 
+        // animation for the color of the module
         Behavior on color {
             ColorAnimation {
                 duration: 330
@@ -108,6 +126,7 @@ Item {
 
         }
 
+        //animation for the radius of the module
         Behavior on radius {
             NumberAnimation {
                 duration: 330
@@ -117,6 +136,11 @@ Item {
 
     }
 
+//-----------------------------------------------------------------------------------
+// The mouseArea section is what makes the module CLICKABLE by using onClicked property
+// it changes the panelstate and other sections of the code can use the panelstate
+// to change the button's visual
+//-----------------------------------------------------------------------------------
     MouseArea {
         id: mouseArea
 

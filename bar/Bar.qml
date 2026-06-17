@@ -38,7 +38,9 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         height: theme.barHeight - 2
         width: contentLayout.implicitWidth + 800
-
+//--------------------------------------------------------------------------------------
+// MAIN SHAPE OF THE BAR
+//--------------------------------------------------------------------------------------
         Shape {
             id: dockBg
 
@@ -47,25 +49,17 @@ PanelWindow {
             anchors.fill: parent
 
             ShapePath {
-                // === RIGHT WING EXTRA ===
-                // === SMOOTH S-CURVE TRANSITION (RIGHT SIDE) ===
-                // === MAIN BAR BOTTOM ===
-                // === SMOOTH S-CURVE TRANSITION (LEFT SIDE - PERFECTLY MIRRORED) ===
-                // === LEFT WING EXTRA (PERFECTLY MIRRORED) ===
-
                 fillColor: theme.base.bg
                 strokeColor: theme.holo.border
                 strokeWidth: 0
                 startX: 0
                 startY: 0
 
-                // 1. Top Line - Spans completely flat across the top edge
                 PathLine {
                     x: dockBg.width
                     y: 0
                 }
 
-                // 2. Your tweaked initial curve down
                 PathQuad {
                     controlX: dockBg.width
                     controlY: 0
@@ -73,13 +67,11 @@ PanelWindow {
                     y: 2
                 }
 
-                // 3. Your tweaked brief runway slope
                 PathLine {
                     x: dockBg.width - 24
                     y: 4
                 }
 
-                // 4. Your custom wide curved connector down to the slope
                 PathQuad {
                     controlX: dockBg.width - 28
                     controlY: 6
@@ -87,7 +79,6 @@ PanelWindow {
                     y: dockBg.height - 14
                 }
 
-                // 5. Your custom Seamless Right Curve (Main bottom corner)
                 PathQuad {
                     controlX: dockBg.width - 45
                     controlY: dockBg.height - 2
@@ -95,13 +86,11 @@ PanelWindow {
                     y: dockBg.height - 2
                 }
 
-                // 6. Flat Bottom Line (Perfect seamless link: right lands at width-54, left starts at 54)
                 PathLine {
                     x: 58
                     y: dockBg.height - 2
                 }
 
-                // 7. Mirrored Main bottom corner (Mirrors step 5 perfectly)
                 PathQuad {
                     controlX: 45
                     controlY: dockBg.height - 2
@@ -109,7 +98,6 @@ PanelWindow {
                     y: dockBg.height - 14
                 }
 
-                // 8. Mirrored custom upper curved connector (Mirrors step 4 perfectly)
                 PathQuad {
                     controlX: 28
                     controlY: 6
@@ -117,13 +105,11 @@ PanelWindow {
                     y: 4
                 }
 
-                // 9. Mirrored runway slope segment (Mirrors step 3 perfectly)
                 PathLine {
                     x: 18
                     y: 2
                 }
 
-                // 10. Mirrored initial curve back up to meet (0,0) (Mirrors step 2 perfectly)
                 PathQuad {
                     controlX: 0
                     controlY: 0
@@ -142,7 +128,10 @@ PanelWindow {
             }
 
         }
-
+//--------------------------------------------------------------------------------------
+// the Clock Widget, it is seperated from othe components so that
+// it can sit cleanly in the middle of the bar
+//--------------------------------------------------------------------------------------
         Clock {
             id: clockWidget
 
@@ -157,6 +146,11 @@ PanelWindow {
 
         }
 
+//--------------------------------------------------------------------------------------
+// This is the bar's RowLayout it contains all the Modules inside a typical bar
+// like Bluetooth, systats, wifi, etc. it is specifically anchored to the lef and right
+// side of the bar to create space from the middle clock module
+//--------------------------------------------------------------------------------------
         RowLayout {
             id: contentLayout
 
@@ -175,7 +169,6 @@ PanelWindow {
                 monitor: Hyprland.monitorFor(targetScreen)
             }
 
-            // CLEANUP: Consolidated the two identical spacers into one layout-efficient stretch element
             Item {
                 Layout.fillWidth: true
             }
@@ -198,6 +191,11 @@ PanelWindow {
 
         }
 
+//--------------------------------------------------------------------------------------
+// This is the SIDE BUTTONS these are 2 extra buttons that lives outside the bar
+// they anchored to the contentLayout above but are margined to the left and right
+// to live just outside the bar
+//--------------------------------------------------------------------------------------
         BtnRound {
             t: theme
             icon: ""

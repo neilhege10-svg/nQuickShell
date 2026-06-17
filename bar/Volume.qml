@@ -6,11 +6,19 @@ import Quickshell.Services.Pipewire
 Item {
     id: root
 
+// ── CORE PROPERTIES ──────────────────────────────────
     property var t
 
+//-----------------------------------------------------------------------------------
+// Tell the Bar's RowLayout exactly how much space this module needs
+//-----------------------------------------------------------------------------------
     implicitHeight: t ? t.pillHeight : 32
     implicitWidth: volLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
 
+//-----------------------------------------------------------------------------------
+// this is the Glow effect, it activates when the module is clicked
+// by using PanelState in the opacity
+//-----------------------------------------------------------------------------------
     DropShadow {
         anchors.fill: pill
         horizontalOffset: 3
@@ -21,6 +29,7 @@ Item {
         source: pill
         opacity: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? 1 : 0
 
+        // animation for the shadow on the module
         Behavior on opacity {
             NumberAnimation {
                 duration: 200
@@ -31,6 +40,9 @@ Item {
 
     }
 
+//-----------------------------------------------------------------------------------
+// Main shape and design of the Volume module
+//-----------------------------------------------------------------------------------
     Rectangle {
         id: pill
 
@@ -43,6 +55,9 @@ Item {
             objects: [Pipewire.defaultAudioSink]
         }
 
+//-----------------------------------------------------------------------------------
+// Main Text design of the Volume module
+//-----------------------------------------------------------------------------------
         Text {
             id: volLabel
 
@@ -71,6 +86,7 @@ Item {
                 family: root.t ? root.t.fontFamily : ""
             }
 
+            // animation for the color of the module's Text color
             Behavior on color {
                 ColorAnimation {
                     duration: 400
@@ -79,6 +95,11 @@ Item {
 
         }
 
+//-----------------------------------------------------------------------------------
+// The mouseArea section is what makes the module CLICKABLE by using onClicked property
+// it changes the panelstate and other sections of the code can use the panelstate
+// to change the button's visual
+//-----------------------------------------------------------------------------------
 MouseArea {
     id: mouseArea
     anchors.fill: parent
@@ -96,6 +117,7 @@ MouseArea {
     }
 }
 
+        // animation for the color of the module's Pill
         Behavior on color {
             ColorAnimation {
                 duration: 330
@@ -103,6 +125,7 @@ MouseArea {
 
         }
 
+        // animation for the color of the module's radius
         Behavior on radius {
             NumberAnimation {
                 duration: 330

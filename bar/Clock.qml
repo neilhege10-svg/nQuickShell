@@ -2,27 +2,22 @@ import Qt5Compat.GraphicalEffects
 import QtQuick
 
 Item {
-    // 2. The Shadow goes first so it renders behind the pill
-    /*   DropShadow {
-        anchors.fill: pill
-        horizontalOffset: 3
-        verticalOffset: 2
-        radius: 8
-        samples: 17
-        color: "#000000"
-        source: pill
-      } */
 
     id: root
 
+// ── CORE PROPERTIES ──────────────────────────────────
     property var t
     property var now: new Date()
 
-    // 1. Tell the Bar's RowLayout exactly how much space this module needs
+//-----------------------------------------------------------------------------------
+// Tell the Bar's RowLayout exactly how much space this module needs
+//-----------------------------------------------------------------------------------
     implicitWidth: timeLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
     implicitHeight: t ? t.pillHeight : 32
 
-    // 3. The actual visual pill
+//-----------------------------------------------------------------------------------
+// this is pretty much the entire clock module... SImple ahh shit
+//-----------------------------------------------------------------------------------
     Rectangle {
         id: pill
 
