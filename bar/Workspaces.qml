@@ -32,16 +32,36 @@ RowLayout {
     spacing: 4
 
 //-----------------------------------------------------------------------------------
-// this is the Repeater. its responsible for displaying all the workspaces
-// (this section probably needs a rework on the description lol)
+// THE WORKSPACE REPEATER - This is the magic that creates all the workspace pills
+// 
+// How it works:
+// - Hyprland.workspaces gives us a list of ALL workspaces that exist
+// - For EACH workspace in that list, this Repeater creates one "delegate" (the pill below)
+// - modelData contains the info for that specific workspace (id, monitor, etc.)
+// - We then check: "Does this workspace belong on THIS monitor?"
+// - If yes, show it. If no, hide it (width: 0, visible: false)
+//
+// Why this matters for multi-monitor:
+// Without this filtering, BOTH monitors would show ALL workspaces (1-10)
+// With this, Monitor 1 only shows workspaces assigned to Monitor 1
+// and Monitor 2 only shows workspaces assigned to Monitor 2
 //-----------------------------------------------------------------------------------
     Repeater {
         model: Hyprland.workspaces
 
         // -----------------------------------------------------------------
         // THE MULTI-MONITOR MULTI-LIGHT FIX:
-        // Checks if this specific workspace is the active one on its assigned monitor.
-        // This ensures both monitors show their active workspace status at all times!
+        // 
+        // This checks TWO things:
+        // 1. belongsHere: "Is this workspace assigned to the monitor I'm on?"
+        //    - If root.monitor exists, check if modelData.monitor.id matches root.monitor.id
+        //    - If no monitor specified, show everything (fallback for single monitor)
+        //
+        // 2. isActive: "Is this workspace currently FOCUSED on its monitor?"
+        //    - Each monitor has its own activeWorkspace
+        //    - We check if this workspace's id matches the active workspace id
+        //    - This ensures both monitors can show their own active workspace
+        //      (not just one global "active" workspace)
         // -----------------------------------------------------------------
         delegate: Item {
             required property var modelData
