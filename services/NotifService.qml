@@ -194,9 +194,12 @@ Item {
     }
 
     function setDND(enabled) {
-        // If enabled (DND on), kill mako. If disabled (DND off), restart it.
-        // We use bash -c because we need shell operators (&) to run mako in background
-        dndProcess.command = ["bash", "-c", enabled ? "pkill mako" : "mako &"]
-        dndProcess.running = true
-    }
+    dndProcess.command = [
+        "makoctl",
+        "mode",
+        "-s",
+        enabled ? "dnd" : "default"
+    ]
+    dndProcess.running = true
+  }
 }
