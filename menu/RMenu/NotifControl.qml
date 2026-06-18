@@ -4,12 +4,21 @@ import "../../assets"
 import "../../services"
 import QtQuick.Layouts
 
+//--------------------------------------------------------------------------------------
+// ROOT ITEM & LOCAL STATE
+//--------------------------------------------------------------------------------------
 Item {
-  id: root
+    id: root
     property var t
-    property bool dndEnabled: false
+
+    // Local state to track the visual toggle position.
+    // The actual backend logic is handled by the service calls in the onToggled blocks.
+    property bool dndProcess: false
     property bool clipboardPaused: false
 
+//--------------------------------------------------------------------------------------
+// BACKGROUND CARD
+//--------------------------------------------------------------------------------------
     Rectangle {
         anchors.fill: parent
         radius: 14
@@ -17,6 +26,10 @@ Item {
         border.color: t.base.border
         border.width: 1
     }
+
+//--------------------------------------------------------------------------------------
+// MAIN CONTENT LAYOUT
+//--------------------------------------------------------------------------------------
     ColumnLayout {
         spacing: 10
 
@@ -28,54 +41,74 @@ Item {
             bottomMargin: 14
         }
 
-     RowLayout {
-        Layout.fillWidth: true
-        spacing: 16
-        Text {
-          text: "DND"
+//--------------------------------------------------------------------------------------
+// DND (DO NOT DISTURB) ROW
+// this section has the UI for the Notifications DND toggle and clearNotifs button
+//--------------------------------------------------------------------------------------
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 16
+
+            Text {
+                text: "DND"
                 font.family: t.fontFamily
                 font.pixelSize: t.fontSize + 2
                 font.bold: true
                 font.letterSpacing: 1.5
                 color: t.base.text
-              }
+            }
+
+            // Spacer to push the toggle and button to the right edge
             Item {
                 Layout.fillWidth: true
             }
 
             ToggleSwitch {
                 t: root.t
-                checked: root.dndEnabled
-                onToggled: root.dndEnabled = !root.dndEnabled
+                checked: root.dndProcess
+                onToggled: {
+                    root.dndProcess = !root.dndProcess;
+                    NotifService.setDND(root.dndProcess);
+                }
             }
 
             BtnRound {
-                t: root.t; icon: "󰆴"; showShadow: true
-
+                t: root.t
+                icon: "󰆴"
+                showShadow: true
+                onClicked: NotifService.clearNotifs()
             }
-          }
+        }
 
-        // SEPERATOR LINE
+//--------------------------------------------------------------------------------------
+// SEPARATOR between the Notifs and Clipboard controls
+//--------------------------------------------------------------------------------------
         Rectangle {
             Layout.fillWidth: true
             height: 1
             color: Qt.rgba(t.holo.text.r, t.holo.text.g, t.holo.text.b, 0.06)
             Layout.topMargin: 10
             Layout.bottomMargin: 10
-          }
-        //SEPERATOR LINE
+        }
 
-     RowLayout {
-        Layout.fillWidth: true
-        spacing: 16
-        Text {
-          text: "CLIPBOARD"
+//--------------------------------------------------------------------------------------
+// CLIPBOARD PAUSE ROW
+// this section has the UI for the ClipHistory pause toggle and clearClipHistory button
+//--------------------------------------------------------------------------------------
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 16
+
+            Text {
+                text: "CLIPBOARD"
                 font.family: t.fontFamily
                 font.pixelSize: t.fontSize + 2
                 font.bold: true
                 font.letterSpacing: 1.5
                 color: t.base.text
-              }
+            }
+
+            // Spacer to push the toggle and button to the right edge
             Item {
                 Layout.fillWidth: true
             }
@@ -83,14 +116,18 @@ Item {
             ToggleSwitch {
                 t: root.t
                 checked: root.clipboardPaused
-                onToggled: root.clipboardPaused = !root.clipboardPaused
+                onToggled: {
+                    root.clipboardPaused = !root.clipboardPaused;
+                    ClipboardService.setClipboardPaused(root.clipboardPaused);
+                }
             }
 
             BtnRound {
-                t: root.t; icon: "󰆴"; showShadow: true
+                t: root.t
+                icon: "󰆴"
+                showShadow: true
+                onClicked: ClipboardService.clearClips()
             }
-          }
-
-
- }
+        }
+    }
 }

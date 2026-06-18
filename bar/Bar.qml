@@ -129,8 +129,8 @@ PanelWindow {
 
         }
 //--------------------------------------------------------------------------------------
-// the Clock Widget, it is seperated from othe components so that
-// it can sit cleanly in the middle of the bar
+// the Clock Widget, it is seperated from contentLayout so that
+// it can be anchored to the center of the bar
 //--------------------------------------------------------------------------------------
         Clock {
             id: clockWidget
@@ -193,7 +193,7 @@ PanelWindow {
 
 //--------------------------------------------------------------------------------------
 // This is the SIDE BUTTONS these are 2 extra buttons that lives outside the bar
-// they anchored to the contentLayout above but are margined to the left and right
+// theyre anchored to the contentLayout above but are margined to the left and right
 // to live just outside the bar
 //--------------------------------------------------------------------------------------
         BtnRound {
