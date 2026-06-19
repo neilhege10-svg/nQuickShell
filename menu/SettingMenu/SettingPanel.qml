@@ -149,7 +149,7 @@ PanelWindow {
                 // ── PLACEHOLDER ── replace with real content
                 Text {
                     anchors.centerIn: parent
-                    text: "PlaceHolder"
+                    text: "SETTINGS"
                     color: Qt.rgba(1, 1, 1, 0.15)
                     font.pixelSize: 32
                     font.letterSpacing: 8
