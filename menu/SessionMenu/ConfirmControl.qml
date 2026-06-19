@@ -259,7 +259,7 @@ ColumnLayout {
             property int bracketSize: 10
             property int cutSize: 4
             property int thickness: 2
-            property color bracketColor: noMouse.containsMouse ? t.holo.textActive : t.holo.border
+            property color bracketColor: noMouse.containsMouse ? t.holo.textAccent : t.holo.border
 
             width: 130
             height: 60
@@ -416,7 +416,7 @@ ColumnLayout {
             Text {
                 anchors.centerIn: parent
                 text: "No"
-                color: noMouse.containsMouse ? t.holo.textActive : t.holo.text
+                color: noMouse.containsMouse ? t.holo.textAccent : t.holo.text
 
                 font {
                     pixelSize: 18

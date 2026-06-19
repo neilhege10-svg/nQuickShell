@@ -79,7 +79,7 @@ Item {
 
                 return "󰕿 " + pct + "%";
             }
-            color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textActive : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
+            color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
 
             font {
                 pixelSize: root.t ? root.t.fontSize : 13

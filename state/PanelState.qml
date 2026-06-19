@@ -5,6 +5,7 @@ QtObject {
     property bool rPanelOpen: false
     property bool lPanelOpen: false
     property bool cPanelOpen: false
+    property bool settingPanelOpen: false
 
     property string activePage: "session"
     property string rPanelPage: "audio"

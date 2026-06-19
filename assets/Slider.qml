@@ -106,7 +106,7 @@ Item {
             radius: width / 2
             x: fill.width - width / 2
             y: (track.height - height) / 2
-            color: trackMouse.containsMouse || trackMouse.pressed ? control.t.holo.text : control.t.base.textActive
+            color: trackMouse.containsMouse || trackMouse.pressed ? control.t.holo.text : control.t.base.textAccent
             opacity: trackMouse.containsMouse || trackMouse.pressed ? 1 : 0.85
             border.color: trackMouse.containsMouse || trackMouse.pressed ? "#ffffff" : "transparent"
             border.width: 1

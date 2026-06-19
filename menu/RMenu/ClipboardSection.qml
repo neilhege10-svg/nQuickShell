@@ -95,7 +95,7 @@ Item {
                         font.pixelSize: root.t.fontSize
                         elide: Text.ElideRight
                         width: root.width - 40
-                        color: root.t.base.textActive
+                        color: root.t.base.text
                         Layout.fillWidth: true
                         wrapMode: Text.Wrap
                         maximumLineCount: 3
@@ -103,7 +103,6 @@ Item {
 
                     // Subtle separator line between clips
                     Rectangle {
-                        anchors.bottom: parent.bottom
                         width: parent.width
                         height: 1
                         color: Qt.rgba(root.t.holo.text.r, root.t.holo.text.g, root.t.holo.text.b, 0.06)

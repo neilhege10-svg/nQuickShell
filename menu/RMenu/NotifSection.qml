@@ -22,7 +22,7 @@ Item {
         HudListHeader {
             t: root.t
             title: "NOTIFS"
-            accentColor: root.t.holo.text
+            accentColor: t.holo.text
             Layout.leftMargin: 10
             Layout.rightMargin: 10
         }
@@ -52,9 +52,9 @@ Item {
 
                     Text {
                         text: modelData.summary
-                        color: root.t.base.text
-                        font.family: root.t.fontFamily
-                        font.pixelSize: root.t.fontSize + 3
+                        color: t.base.text
+                        font.family: t.fontFamily
+                        font.pixelSize: t.fontSize + 3
                         font.bold: true
                         Layout.fillWidth: true
                     }
@@ -65,7 +65,7 @@ Item {
                         font.pixelSize: root.t.fontSize
                         elide: Text.ElideRight
                         width: root.width - 40
-                        color: root.t.base.textActive
+                        color: root.t.base.text
                         Layout.fillWidth: true
                         wrapMode: Text.Wrap
                         maximumLineCount: 3

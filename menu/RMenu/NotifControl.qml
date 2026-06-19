@@ -22,7 +22,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 14
-        color: t.base.altbg
+        color: Qt.rgba(t.base.surface.r, t.base.surface.g, t.base.surface.b, 0.5)
         border.color: t.base.border
         border.width: 1
     }

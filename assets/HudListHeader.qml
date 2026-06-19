@@ -42,7 +42,7 @@ RowLayout {
     // Main Title Text
     Text {
         text: root.title
-        color: t.holo.text
+        color: t.base.accent
 
         font {
             family: t.holoFont

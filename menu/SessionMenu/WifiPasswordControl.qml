@@ -40,7 +40,7 @@ ColumnLayout {
 
         Text {
             text: PanelState.wifiTarget ? PanelState.wifiTarget.name : ""
-            color: t.holo.textActive
+            color: t.holo.textAccent
             font.family: t.fontFamily
             font.pixelSize: 20
             font.bold: true
@@ -90,7 +90,7 @@ ColumnLayout {
                 anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
                 verticalAlignment: TextInput.AlignVCenter
                 echoMode: TextInput.Password
-                color: t.holo.textActive
+                color: t.holo.textAccent
                 selectionColor: Qt.rgba(t.holo.neonActive.r, t.holo.neonActive.g, t.holo.neonActive.b, 0.35)
 
                 font {

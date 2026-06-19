@@ -28,7 +28,7 @@ Item {
     readonly property color finalBorderColor: root.t.base.border
     // Text & Glyph track
     readonly property color finalTextColor: {
-        return root.activeState ? root.t.base.textActive : root.t.base.text;
+        return root.activeState ? root.t.base.textAccent : root.t.base.text;
     }
     // Shadow Radius track
     readonly property int finalGlowRadius: {

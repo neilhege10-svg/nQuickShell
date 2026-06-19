@@ -19,7 +19,7 @@ Rectangle {
     // How large the chamfer/angle cut is
     property int thickness: 2
     // Line thickness
-    property color bracketColor: btnMouse.containsMouse ? t.holo.textActive : t.holo.border
+    property color bracketColor: btnMouse.containsMouse ? t.holo.textAccent : t.holo.border
 
     implicitWidth: 110
     implicitHeight: 110
@@ -187,7 +187,7 @@ Rectangle {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: icon
-            color: btnMouse.containsMouse ? t.holo.textActive : t.holo.text
+            color: btnMouse.containsMouse ? t.holo.textAccent : t.holo.text
 
             font {
                 pixelSize: 40
@@ -199,7 +199,7 @@ Rectangle {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: label
-            color: btnMouse.containsMouse ? t.holo.textActive : t.holo.text
+            color: btnMouse.containsMouse ? t.holo.textAccent : t.holo.text
 
             font {
                 pixelSize: 15

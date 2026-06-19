@@ -111,7 +111,7 @@ ColumnLayout {
                 Text {
                     visible: modelData.secured && modelData.type === "wifi"
                     text: "󰌾"
-                    color: Qt.rgba(root.t.base.textActive.r, root.t.base.textActive.g, root.t.base.textActive.b, 0.4)
+                    color: Qt.rgba(root.t.base.textAccent.r, root.t.base.textAccent.g, root.t.base.textAccent.b, 0.4)
 
                     font {
                         family: root.t.fontFamily

@@ -102,7 +102,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
                     text: typeof currentData === "string" ? currentData : (currentData[root.labelProperty] || "")
                     elide: Text.ElideRight
-                    color: delegateItem.isActive ? t.holo.textActive : Qt.rgba(t.base.textActive.r, t.base.textActive.g, t.base.textActive.b, 0.6)
+                    color: delegateItem.isActive ? t.holo.textAccent : Qt.rgba(t.base.textInactive.r, t.base.textInactive.g, t.base.textInactive.b, 0.6)
 
                     font {
                         family: t.fontFamily

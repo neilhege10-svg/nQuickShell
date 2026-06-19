@@ -2,6 +2,7 @@ import Quickshell
 import "bar"
 import "menu/RMenu"
 import "menu/SessionMenu"
+import "menu/SettingMenu"
 
 ShellRoot {
     Variants {
@@ -26,6 +27,16 @@ ShellRoot {
 
     }
 
+    Variants {
+        model: Quickshell.screens
+
+        delegate: SettingPanel {
+            required property var modelData
+
+            targetScreen: modelData
+        }
+
+    }
     Variants {
         model: Quickshell.screens
 

@@ -26,8 +26,8 @@ Item {
 
         anchors.fill: parent
         radius: height / 2
-        color: root.checked ? root.t.base.text : Qt.rgba(root.t.base.textActive.r, root.t.base.textActive.g, root.t.base.textActive.b, 0.08)
-        border.color: root.checked ? root.t.base.border : Qt.rgba(root.t.base.textActive.r, root.t.base.textActive.g, root.t.base.textActive.b, 0.2)
+        color: root.checked ? root.t.base.text : Qt.rgba(root.t.base.textAccent.r, root.t.base.textAccent.g, root.t.base.textAccent.b, 0.08)
+        border.color: root.checked ? root.t.base.border : Qt.rgba(root.t.base.textAccent.r, root.t.base.textAccent.g, root.t.base.textAccent.b, 0.2)
         border.width: 1
         // Optional glow on the track when active
         layer.enabled: root.checked
@@ -64,7 +64,7 @@ Item {
         radius: 10
         anchors.verticalCenter: parent.verticalCenter
         x: root.checked ? parent.width - width - 4 : 4
-        color: root.checked ? root.t.holo.textActive : root.t.base.textActive
+        color: root.checked ? root.t.holo.textAccent : root.t.base.textAccent
         // Subtle inner shadow to make it look raised
         layer.enabled: true
 

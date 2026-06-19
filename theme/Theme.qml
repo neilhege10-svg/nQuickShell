@@ -24,21 +24,21 @@ QtObject {
     // ─────────────────────────────────────────────────────────────
     readonly property QtObject
     base: QtObject {
-        readonly property color bg: "#202636"
-        readonly property color surface: "#1a1e2b"
-        readonly property color text: "#03cffc"
-        readonly property color textActive: "#e6e6e6"
-        readonly property color accent: "#03cffc"
-        readonly property color border: "#4096bfff"
+        readonly property color bg: "#1c1c1c"
+        readonly property color surface: "#141414"
+        readonly property color text: "#e6e6e6"
+        readonly property color textAccent: "#1c1c1c"
+        readonly property color textInactive: "#6e6e6e"
+        readonly property color accent: "#03befc"
+        readonly property color border: "#BF454545"
         readonly property color shadow: "#4d010101"
-        readonly property color altbg: "#4d171b26" // Your moved RightPanel BG
     }
 
     readonly property QtObject
     holo: QtObject {
         readonly property color bgtransparent: "#4d3e78d6"
         readonly property color text: "#03cffc"
-        readonly property color textActive: "#7ae7ff"
+        readonly property color textAccent: "#7ae7ff"
         readonly property color holobg: "#1a3e78d6"
         readonly property color bgsel: "#994381e6"
         readonly property color border: "#ff96bfff"
@@ -50,27 +50,40 @@ QtObject {
         readonly property color warningActive: "#ff7777"
         readonly property color warningBg: "#1aff5555"
         readonly property color warningBgSel: "#4dff5555"
-    }
+      }
+      // ==========================================
+// TRANSPARENCY CHEAT SHEET
+// ==========================================
 
-    // ─────────────────────────────────────────────────────────────
-    // 3. BACKWARD COMPATIBILITY PROXY LAYER
-    // ─────────────────────────────────────────────────────────────
-    // Normal UI Proxies
-    readonly property color bg: root.base.bg
-    readonly property color surface: root.base.surface
-    readonly property color text: root.base.text
-    readonly property color textalt: root.base.textActive // Aligned to your new name
-    readonly property color accent: root.base.accent
-    readonly property color border: root.base.border
-    // Holographic UI Proxies
-    readonly property color bgTransparent: root.holo.bgtransparent
-    // Fixed lowercase casing
-    readonly property color holoText: root.holo.text
-    readonly property color holoTextsel: root.holo.textActive // Aligned to your new name
-    readonly property color holoBG: root.holo.holobg // Fixed lowercase casing
-    readonly property color holoBGsel: root.holo.bgsel
-    readonly property color holoBorder: root.holo.border
-    readonly property color holoShadow: root.holo.shadow
-    // Right Panel Proxies
-    readonly property color rpBG: root.base.altbg
+// 1. BASE COLOR (MUST be 'color' type, NEVER 'string')
+readonly property color baseSurface: "#1e1e2e"
+
+// 2. DYNAMIC METHOD: Qt.rgba()
+// Extracts RGB from baseSurface, applies alpha (0.0 to 1.0)
+readonly property color surface_40pct: Qt.rgba(baseSurface.r, baseSurface.g, baseSurface.b, 0.4)
+readonly property color surface_80pct: Qt.rgba(baseSurface.r, baseSurface.g, baseSurface.b, 0.8)
+
+// 3. STATIC METHOD: Hex Alpha #AARRGGBB (5% increments)
+// Format: # + AA (Alpha) + RRGGBB (Your base color)
+readonly property color alpha_00: "#001e1e2e"  // 0% (Invisible)
+readonly property color alpha_05: "#0D1e1e2e"  // 5%
+readonly property color alpha_10: "#1A1e1e2e"  // 10%
+readonly property color alpha_15: "#261e1e2e"  // 15%
+readonly property color alpha_20: "#331e1e2e"  // 20%
+readonly property color alpha_25: "#401e1e2e"  // 25%
+readonly property color alpha_30: "#4D1e1e2e"  // 30%
+readonly property color alpha_35: "#591e1e2e"  // 35%
+readonly property color alpha_40: "#661e1e2e"  // 40%
+readonly property color alpha_45: "#731e1e2e"  // 45%
+readonly property color alpha_50: "#801e1e2e"  // 50%
+readonly property color alpha_55: "#8C1e1e2e"  // 55%
+readonly property color alpha_60: "#991e1e2e"  // 60%
+readonly property color alpha_65: "#A61e1e2e"  // 65%
+readonly property color alpha_70: "#B31e1e2e"  // 70%
+readonly property color alpha_75: "#BF1e1e2e"  // 75%
+readonly property color alpha_80: "#CC1e1e2e"  // 80%
+readonly property color alpha_85: "#D91e1e2e"  // 85%
+readonly property color alpha_90: "#E61e1e2e"  // 90%
+readonly property color alpha_95: "#F21e1e2e"  // 95%
+readonly property color alpha_100:"#FF1e1e2e"  // 100% (Solid)
 }

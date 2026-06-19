@@ -133,7 +133,7 @@ RowLayout {
                     text: root.workspaceIcons[modelData.id] || modelData.id
                     // Fixed: Replaced "transparent" fallback with a visible dim color
                     // so you can actually read the icons/numbers when inactive
-                    color: isActive ? (root.t ? root.t.base.textActive : "#cdd6f4") : "transparent"
+                    color: isActive ? (root.t ? root.t.base.textAccent : "#cdd6f4") : "transparent"
 
                     font {
                         pixelSize: 16

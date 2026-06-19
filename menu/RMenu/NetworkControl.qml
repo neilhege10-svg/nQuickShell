@@ -19,7 +19,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 14
-        color: t.base.altbg
+        color: Qt.rgba(t.base.surface.r, t.base.surface.g, t.base.surface.b, 0.5)
         border.color: t.base.border
         border.width: 1
     }
@@ -47,7 +47,7 @@ Item {
                 font.pixelSize: t.fontSize + 2
                 font.bold: true
                 font.letterSpacing: 1.5
-                color: NetworkService.wifiEnabled ? t.base.text : Qt.rgba(t.base.textActive.r, t.base.textActive.g, t.base.textActive.b, 0.4)
+                color: NetworkService.wifiEnabled ? t.base.text : Qt.rgba(t.base.textAccent.r, t.base.textAccent.g, t.base.textAccent.b, 0.4)
 
                 Behavior on color {
                     ColorAnimation {
@@ -90,7 +90,7 @@ Item {
                 font.pixelSize: t.fontSize + 2
                 font.bold: true
                 font.letterSpacing: 1.5
-                color: NetworkService.btEnabled ? t.base.text : Qt.rgba(t.base.textActive.r, t.base.textActive.g, t.base.textActive.b, 0.4)
+                color: t.base.text
 
                 Behavior on color {
                     ColorAnimation {

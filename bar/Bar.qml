@@ -120,7 +120,7 @@ PanelWindow {
             }
 
             layer.effect: DropShadow {
-                horizontalOffset: o
+                horizontalOffset: 0
                 verticalOffset: 4
                 radius: 12
                 samples: 17
@@ -202,6 +202,8 @@ PanelWindow {
             hasBorder: true
             showShadow: true
             scale: 0.82
+            activeState: PanelState.settingPanelOpen
+            onClicked: PanelState.settingPanelOpen = !PanelState.settingPanelOpen
 
             anchors {
                 left: contentLayout.right

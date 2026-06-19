@@ -20,11 +20,9 @@ Item {
         id: bgPanel
 
         anchors.fill: parent
-        // Deep background layer matching your command-center setup
-        color: t.base.altbg
+        color: Qt.rgba(t.base.surface.r, t.base.surface.g, t.base.surface.b, 0.5)
         radius: 12
         antialiasing: true
-        // Clean, valid low-opacity cyberpunk border outline using color channels
         border.color: t.base.border
         border.width: 1
     }
@@ -50,7 +48,7 @@ Item {
 
                 Text {
                     text: "OUTPUT"
-                    color: t.holo.text
+                    color: t.base.text
 
                     font {
                         pixelSize: t.fontSize - 1
@@ -63,7 +61,7 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: AudioService.outputName
-                    color: t.base.textActive
+                    color: t.base.text
                     elide: Text.ElideRight
                     opacity: 0.6 // Tucked back into visual hierarchy
 
@@ -99,7 +97,7 @@ Item {
 
                 Text {
                     text: "INPUT"
-                    color: t.holo.text
+                    color: t.base.text
 
                     font {
                         pixelSize: t.fontSize - 1
@@ -112,7 +110,7 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: AudioService.inputName
-                    color: t.base.textActive
+                    color: t.base.text
                     elide: Text.ElideRight
                     opacity: 0.6
 
