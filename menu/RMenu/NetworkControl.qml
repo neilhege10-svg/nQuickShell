@@ -47,7 +47,7 @@ Item {
                 font.pixelSize: t.fontSize + 2
                 font.bold: true
                 font.letterSpacing: 1.5
-                color: NetworkService.wifiEnabled ? t.base.text : Qt.rgba(t.base.textAccent.r, t.base.textAccent.g, t.base.textAccent.b, 0.4)
+                color: t.base.text
 
                 Behavior on color {
                     ColorAnimation {
@@ -74,7 +74,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: Qt.rgba(t.holo.text.r, t.holo.text.g, t.holo.text.b, 0.06)
+            color: t.base.border
             Layout.topMargin: 10
             Layout.bottomMargin: 10
         }
