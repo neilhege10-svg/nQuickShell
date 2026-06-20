@@ -162,8 +162,9 @@ PanelWindow {
 
                 ListView {
                  id: sidebar
-                 Layout.preferredWidth: 180     // fixed width for the sidebar
+                 Layout.preferredWidth: 150     // fixed width for the sidebar
                  Layout.fillHeight: true        // stretches to fill available height
+                 Layout.topMargin: 10
                  model: ["Display", "Audio", "Network", "About"]  
 
                  delegate: Item {
@@ -180,15 +181,17 @@ PanelWindow {
                }
 
                Rectangle {
-                 anchors.bottom: parent.bottom
-                 width: 1
-                 height: parent.height
-                 color: t.base.border
-               }
+                 // Background for the Individual Settings page
+                 id: settingsContent
+                 radius: 8
+                 color: t.base.surface
 
-                Item {
                  Layout.fillWidth: true
                  Layout.fillHeight: true
+
+                 Layout.topMargin:10
+                 Layout.bottomMargin:10
+                 Layout.rightMargin:10
                }
 
             }
