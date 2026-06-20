@@ -24,7 +24,7 @@ Item {
         anchors.fill: parent
         radius: t ? t.widgetRadius : 8
         color: t ? t.base.surface : "#313244"
-        border.color: "#42485c"
+        border.color: t.base.border
         border.width: 1
 
         Timer {
