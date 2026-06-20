@@ -6,11 +6,13 @@ import QtQuick
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
+import QtQuick.Layouts
 
 PanelWindow {
     id: root
 
     required property var targetScreen
+    property var t: theme
 
     WlrLayershell.screen: targetScreen
     WlrLayershell.layer: WlrLayer.Top
@@ -147,15 +149,51 @@ PanelWindow {
                 opacity: 0
 
                 // ── PLACEHOLDER ── replace with real content
-                Text {
-                    anchors.centerIn: parent
-                    text: "SETTINGS"
-                    color: Qt.rgba(1, 1, 1, 0.15)
-                    font.pixelSize: 32
-                    font.letterSpacing: 8
+              RowLayout {
+                spacing: 4
+
+                anchors {
+                  top: parent.top
+                  left: parent.left
+                  right: parent.right
+                  bottom: parent.bottom
+                  margins: 10
                 }
+
+                ListView {
+                 id: sidebar
+                 Layout.preferredWidth: 180     // fixed width for the sidebar
+                 Layout.fillHeight: true        // stretches to fill available height
+                 model: ["Display", "Audio", "Network", "About"]  
+
+                 delegate: Item {
+                   width: sidebar.width
+                   height: 40
+                   Text {
+                     anchors.verticalCenter: parent.verticalCenter
+                     anchors.left: parent.left
+                     anchors.leftMargin: 12
+                     text: modelData
+                     color: t.base.text
+                   }
+                 }
+               }
+
+               Rectangle {
+                 anchors.bottom: parent.bottom
+                 width: 1
+                 height: parent.height
+                 color: t.base.border
+               }
+
+                Item {
+                 Layout.fillWidth: true
+                 Layout.fillHeight: true
+               }
+
             }
-        }
+       }
+  }
 
         // ── CONTENT FLICKER ───────────────────────────────────────────
         FlickerAnimation {
