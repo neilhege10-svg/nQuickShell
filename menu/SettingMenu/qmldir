@@ -1,2 +1,4 @@
 SettingPanel 1.0 SettingPanel.qml
+ThemeSwitcher 1.0 ThemeSwitcher.qml
+WallpaperSwitcher 1.0 WallpaperSwitcher.qml
 

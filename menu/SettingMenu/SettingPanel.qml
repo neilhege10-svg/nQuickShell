@@ -41,6 +41,7 @@ PanelWindow {
 
     Item {
         id: panel
+        property string settingsPage: "themes"
 
         width: 1000
         height: 700
@@ -150,7 +151,7 @@ PanelWindow {
 
                 // ── PLACEHOLDER ── replace with real content
               RowLayout {
-                spacing: 4
+                spacing: 10
 
                 anchors {
                   top: parent.top
@@ -162,14 +163,24 @@ PanelWindow {
 
                 ListView {
                  id: sidebar
-                 Layout.preferredWidth: 150     // fixed width for the sidebar
+                 Layout.preferredWidth: 110     // fixed width for the sidebar
                  Layout.fillHeight: true        // stretches to fill available height
                  Layout.topMargin: 10
-                 model: ["Display", "Audio", "Network", "About"]  
+                 model: ["Themes", "Wallpapers"]  
 
                  delegate: Item {
+                   id: delegateItem
                    width: sidebar.width
                    height: 40
+
+                   property bool isActive: panel.settingsPage === modelData.toLowerCase()
+
+                   Rectangle {
+                     anchors.fill: parent
+                     color: delegateItem.isActive ? Qt.rgba(t.holo.neonActive.r, t.holo.neonActive.g, t.holo.neonActive.b, 0.2) : "transparent"
+                   }
+
+
                    Text {
                      anchors.verticalCenter: parent.verticalCenter
                      anchors.left: parent.left
@@ -177,23 +188,40 @@ PanelWindow {
                      text: modelData
                      color: t.base.text
                    }
+
+                   MouseArea {
+                     anchors.fill: parent
+                     onClicked: panel.settingsPage = modelData.toLowerCase()
+                   }
                  }
                }
+             
 
-               Rectangle {
-                 // Background for the Individual Settings page
-                 id: settingsContent
-                 radius: 8
-                 color: t.base.surface
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.topMargin: 10
+                    Layout.bottomMargin: 10
+                    Layout.rightMargin: 5
 
-                 Layout.fillWidth: true
-                 Layout.fillHeight: true
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 8
+                        color: t.base.surface
+                    }
 
-                 Layout.topMargin:10
-                 Layout.bottomMargin:10
-                 Layout.rightMargin:10
-               }
+                    ThemeSwitcher {
+                        t: panel.t
+                        anchors.fill: parent
+                        visible: panel.settingsPage === "themes"
+                    }
 
+                    WallpaperSwitcher {
+                        t: panel.t
+                        anchors.fill: parent
+                        visible: panel.settingsPage === "wallpapers"
+                    }
+                }
             }
        }
   }
