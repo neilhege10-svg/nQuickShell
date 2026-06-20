@@ -135,9 +135,10 @@ Item {
                 
                 // This is the final assignment to the public property
                 root.notifications = combined
-                console.log("NotifService: total", root.notifications.length, "notifications")
-            } catch(e) {
-                console.log("NotifService: history parse error", e)
+                // console.log("NotifService: total", root.notifications.length, "notifications") //(Debugging tool)
+              } 
+              catch(e) {
+                // console.log("NotifService: history parse error", e)    //(debugging tool)
             }
         }
     }

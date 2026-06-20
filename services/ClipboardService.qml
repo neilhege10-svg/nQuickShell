@@ -87,7 +87,7 @@ Item {
         onExited: function(code, status) {
             // Only keep the last 50 items for the UI
             root.clips = root._clipBuf.slice(-50);
-            console.log("ClipboardService: loaded", root.clips.length, "clips");
+           //console.log("ClipboardService: loaded", root.clips.length, "clips"); //(debuggin tool)
         }
 
         stdout: SplitParser {

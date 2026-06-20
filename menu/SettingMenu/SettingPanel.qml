@@ -211,13 +211,13 @@ PanelWindow {
                     }
 
                     ThemeSwitcher {
-                        t: panel.t
+                        t: theme
                         anchors.fill: parent
                         visible: panel.settingsPage === "themes"
                     }
 
                     WallpaperSwitcher {
-                        t: panel.t
+                        t: theme
                         anchors.fill: parent
                         visible: panel.settingsPage === "wallpapers"
                     }
