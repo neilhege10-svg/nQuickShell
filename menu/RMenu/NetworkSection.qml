@@ -14,6 +14,9 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
 
+//---------------------------------------------------------------
+// Uses the column layout to organize the Header and the content
+//---------------------------------------------------------------
 ColumnLayout {
     id: root
 
@@ -25,7 +28,9 @@ ColumnLayout {
         fill: parent
         margins: 15
     }
-
+//---------------------------------------------------------------
+// uses the HudListHeader.qml to display the Header
+//---------------------------------------------------------------
     HudListHeader {
         t: root.t
         title: "NETWORK"
@@ -33,8 +38,10 @@ ColumnLayout {
         Layout.leftMargin: 10
         Layout.rightMargin: 10
     }
-
-    // ── SWAPPED TO SCROLLABLE MENU ───────────────────────────────────────────
+//---------------------------------------------------------------
+// uses the ScrollHudList to display the available Network 
+// devices in NetworkService.qml
+//---------------------------------------------------------------
     ScrollHudList {
         id: networkList
 
@@ -144,7 +151,10 @@ ColumnLayout {
             }
         }
     }
-
+//---------------------------------------------------------------
+// This item is used to make sure the header doesnt fall to the
+// center if there is no content in the ScrollHudList
+//---------------------------------------------------------------
     Item {
         Layout.fillWidth: true
         Layout.fillHeight: true

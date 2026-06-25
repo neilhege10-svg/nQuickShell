@@ -4,6 +4,9 @@ import "../../theme"
 import QtQuick
 import QtQuick.Layouts
 
+//---------------------------------------------------------------
+// Uses the column layout to organize the Header and the content
+//---------------------------------------------------------------
 ColumnLayout {
     property var t
 
@@ -13,8 +16,9 @@ ColumnLayout {
         fill: parent
         margins: 10
     }
-
-    // Use your reusable header
+//---------------------------------------------------------------
+// uses the HudListHeader.qml to display the Header
+//---------------------------------------------------------------
     HudListHeader {
         t: theme
         title: "INPUT DEVICE"
@@ -22,7 +26,10 @@ ColumnLayout {
         Layout.leftMargin: 10
         Layout.rightMargin: 10
     }
-
+//---------------------------------------------------------------
+// uses the ScrollHudList to display the Audio Input devices
+// in AudioService.qml
+//---------------------------------------------------------------
     ScrollHudList {
         t: theme
         listModel: AudioService.inputDevices
@@ -34,7 +41,10 @@ ColumnLayout {
             AudioService.setInputDevice(device);
         }
     }
-
+//---------------------------------------------------------------
+// This item is used to make sure the header doesnt fall to the
+// center if there is no content in the ScrollHudList
+//---------------------------------------------------------------
     Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
