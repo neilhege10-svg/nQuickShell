@@ -15,10 +15,11 @@ Item {
     width: menuWidth
     height: menuHeight
 
-    // ── CENTRALIZED VOLUME CONTEXT CARD ─────────────────
+//--------------------------------------------------------------------------------------
+// BACKGROUND CARD
+//--------------------------------------------------------------------------------------
     Rectangle {
         id: bgPanel
-
         anchors.fill: parent
         color: Qt.rgba(t.base.surface.r, t.base.surface.g, t.base.surface.b, 0.5)
         radius: 12
@@ -27,53 +28,59 @@ Item {
         border.width: 1
     }
 
-    // ── CONTROL LAYOUT ──────────────────────────────────
+//------------------------------------------------------ 
+// The main ColumnLayout that holds the Output and Input section
+//-------------------------------------------------------
     ColumnLayout {
-        spacing: 16 // Added extra breathing room between the two main slider sectors
+        spacing: 16
 
         anchors {
             fill: parent
             margins: 16
         }
 
-        // ─── OUTPUT BLOCK ───
+//------------------- OUTPUT SECTION --------------------
+// This ColumnLayout Holds the individual components
+// for the The "OUTPUT" Devices
+//-------------------------------------------------------
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 6
 
-            // Header Row: Separates functional tracking from device tracking
+            // The RowLayout holds the Header and Device name
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
-                    text: "OUTPUT"
-                    color: t.base.text
+              // HEADER
+              Text {
+                text: "OUTPUT"
+                color: t.base.text
 
-                    font {
-                        pixelSize: t.fontSize - 1
-                        family: t.fontFamily
-                        bold: true
-                    }
+                  font {
+                    pixelSize: t.fontSize - 1
+                    family: t.fontFamily
+                    bold: true
+                   }
+               }
 
-                }
+               // Output Device name
+              Text {
+                 Layout.fillWidth: true
+                 text: AudioService.outputName
+                 color: t.base.text
+                 elide: Text.ElideRight
+                 opacity: 0.6
 
-                Text {
-                    Layout.fillWidth: true
-                    text: AudioService.outputName
-                    color: t.base.text
-                    elide: Text.ElideRight
-                    opacity: 0.6 // Tucked back into visual hierarchy
+                  font {
+                      pixelSize: t.fontSize + 1
+                      family: t.fontFamily
+                     }
 
-                    font {
-                        pixelSize: t.fontSize + 1
-                        family: t.fontFamily
-                    }
-
-                }
+                 }
 
             }
-
+            // A Simple Slider for the volumes
             Slider {
                 t: root.t // Pass down unified context smoothly
                 Layout.fillWidth: true
@@ -85,28 +92,33 @@ Item {
 
         }
 
-        // ─── INPUT BLOCK ───
+//------------------- INPUT SECTION --------------------
+// This ColumnLayout Holds the individual components
+// for the The "INPUT" Devices
+//-------------------------------------------------------
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 6
 
-            // Header Row
+            // The RowLayout holds the Header and Device name
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
-                    text: "INPUT"
-                    color: t.base.text
+              // HEADER
+              Text {
+                text: "INPUT"
+                color: t.base.text
 
-                    font {
-                        pixelSize: t.fontSize - 1
-                        family: t.fontFamily
-                        bold: true
+                  font {
+                     pixelSize: t.fontSize - 1
+                     family: t.fontFamily
+                     bold: true
                     }
 
-                }
+                  }
 
+               // Input Device name
                 Text {
                     Layout.fillWidth: true
                     text: AudioService.inputName
@@ -121,8 +133,8 @@ Item {
 
                 }
 
-            }
-
+              }
+            // A Simple Slider for the volumes
             Slider {
                 t: root.t
                 Layout.fillWidth: true

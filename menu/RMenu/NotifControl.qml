@@ -48,7 +48,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             spacing: 16
-
+            // HEADER
             Text {
                 text: "DND"
                 font.family: t.fontFamily
@@ -57,12 +57,11 @@ Item {
                 font.letterSpacing: 1.5
                 color: t.base.text
             }
-
             // Spacer to push the toggle and button to the right edge
             Item {
                 Layout.fillWidth: true
             }
-
+            // DND ToggleSwitch
             ToggleSwitch {
                 t: root.t
                 checked: root.dndProcess
@@ -71,7 +70,7 @@ Item {
                     NotifService.setDND(root.dndProcess);
                 }
             }
-
+            // Clear Button 
             BtnRound {
                 t: root.t
                 icon: "󰆴"
@@ -98,7 +97,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             spacing: 16
-
+            // HEADER
             Text {
                 text: "CLIPBOARD"
                 font.family: t.fontFamily
@@ -107,12 +106,11 @@ Item {
                 font.letterSpacing: 1.5
                 color: t.base.text
             }
-
             // Spacer to push the toggle and button to the right edge
             Item {
                 Layout.fillWidth: true
             }
-
+            // the switch to turn off the clipboard
             ToggleSwitch {
                 t: root.t
                 checked: root.clipboardPaused
@@ -121,7 +119,7 @@ Item {
                     ClipboardService.setClipboardPaused(root.clipboardPaused);
                 }
             }
-
+            // Clear Button 
             BtnRound {
                 t: root.t
                 icon: "󰆴"

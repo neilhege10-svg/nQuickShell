@@ -15,7 +15,9 @@ Item {
 
     property var t
 
-    // ── BACKGROUND CARD ────────────────────────────────────────────────
+//------------------------------------------
+//The Main Background for this component
+//------------------------------------------
     Rectangle {
         anchors.fill: parent
         radius: 14
@@ -24,7 +26,7 @@ Item {
         border.width: 1
     }
 
-    // ── ROWS ───────────────────────────────────────────────────────────
+    // a simple ColumnLayout
     ColumnLayout {
         spacing: 0
 
@@ -36,11 +38,15 @@ Item {
             bottomMargin: 14
         }
 
-        // ── WIFI ROW ──────────────────────────────────────────────────
+//------------------------------------------
+// The Wifi text + on/off toggle for Wifi
+// all placed in uisng a RowLayout
+//------------------------------------------
         RowLayout {
             Layout.fillWidth: true
             spacing: 0
 
+            // the WIFI Header 
             Text {
                 text: "WIFI"
                 font.family: t.fontFamily
@@ -57,11 +63,12 @@ Item {
                 }
 
             }
-
+            // this creates a gap between the Header and ToggleSwitch,
+            // pinning the Header to the left and the ToggleSwitch to the right
             Item {
                 Layout.fillWidth: true
             }
-
+            // the on/off switch
             ToggleSwitch {
                 t: root.t
                 checked: NetworkService.wifiEnabled
@@ -70,7 +77,10 @@ Item {
 
         }
 
-        // ── SEPARATOR ─────────────────────────────────────────────────
+//------------------------------------------
+// a Separator line between the Bluetooth
+// and Wifi RowLayout
+//------------------------------------------
         Rectangle {
             Layout.fillWidth: true
             height: 1
@@ -79,11 +89,16 @@ Item {
             Layout.bottomMargin: 10
         }
 
-        // ── BLUETOOTH ROW ─────────────────────────────────────────────
+//------------------------------------------
+// The Bluetooth text + on/off toggle for
+// bluetooth
+// all placed in uisng a RowLayout
+//------------------------------------------
         RowLayout {
             Layout.fillWidth: true
             spacing: 0
 
+            // the Bluetooth Header 
             Text {
                 text: "BLUETOOTH"
                 font.family: t.fontFamily
@@ -100,11 +115,12 @@ Item {
                 }
 
             }
-
+            // this creates a gap between the Header and ToggleSwitch,
+            // pinning the Header to the left and the ToggleSwitch to the right
             Item {
                 Layout.fillWidth: true
             }
-
+            // the on/off switch
             ToggleSwitch {
                 t: root.t
                 checked: NetworkService.btEnabled

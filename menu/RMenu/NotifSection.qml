@@ -6,11 +6,13 @@ import QtQuick.Layouts
 
 Item {
     id: root
-
     property var t
 
+//------------------------------------------------------ 
+// ColumnLayout to sort the Header and Listview
+// ------------------------------------------------------
     ColumnLayout {
-        spacing: 4
+      spacing: 4
 
         anchors {
             top: parent.top
@@ -18,7 +20,9 @@ Item {
             right: parent.right
             margins: 15
         }
-
+//------------------------------------------------------ 
+// MAIN HEADER FOR THE NotifSection
+// ------------------------------------------------------
         HudListHeader {
             t: root.t
             title: "NOTIFS"
@@ -27,6 +31,10 @@ Item {
             Layout.rightMargin: 10
         }
 
+//------------------------------------------------------ 
+// a Listview to list all the Notifications in a
+// scrollable column list
+// ------------------------------------------------------
         ListView {
             model: NotifService.notifications
             Layout.fillWidth: true
@@ -50,6 +58,7 @@ Item {
                         leftMargin: 12
                     }
 
+                    //Summary Text, usually for the App title or the Header for the notification
                     Text {
                         text: modelData.summary
                         color: t.base.text
@@ -59,6 +68,7 @@ Item {
                         Layout.fillWidth: true
                     }
 
+                    //the actual Notification
                     Text {
                         text: modelData.body
                         font.family: root.t.fontFamily
@@ -73,6 +83,10 @@ Item {
 
                 }
 
+//------------------------------------------------------ 
+// a Simple Separator to seperate each items
+// it lives inside the Listview and outside the ColumnLayout
+// ------------------------------------------------------
                 Rectangle {
                     anchors.bottom: parent.bottom
                     width: parent.width
