@@ -23,9 +23,8 @@ Item {
 
         anchors.fill: parent
         radius: t ? t.widgetRadius : 8
-        color: t ? t.base.surface : "#313244"
-        border.color: t.base.border
-        border.width: 1
+        color: "transparent"
+        border.width: 0
 
         Timer {
             interval: 60000
@@ -38,7 +37,7 @@ Item {
             id: timeLabel
 
             anchors.centerIn: parent
-            text: Qt.formatDateTime(root.now, "hh:mm · ddd d MMM")
+            text: Qt.formatDateTime(root.now, "hh:mm · ddd d")
             color: root.t ? root.t.base.text : "#cdd6f4"
 
             font {

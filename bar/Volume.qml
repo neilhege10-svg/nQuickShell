@@ -47,8 +47,8 @@ Item {
         id: pill
 
         anchors.fill: parent
-        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? 12 : (t ? t.widgetRadius : 8)
-        color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (t ? t.base.accent : "#b4befe") : (t ? t.base.surface : "#313244")
+        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (t ? t.widgetRadius : 12) : (t ? t.widgetRadius : 12)
+        color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (t ? t.base.accent : "#b4befe") : ("transparent")
         scale: mouseArea.pressed ? 0.9 : 1
 
         PwObjectTracker {
@@ -65,19 +65,19 @@ Item {
             text: {
                 var sink = Pipewire.defaultAudioSink;
                 if (!sink || !sink.audio)
-                    return "󰸈 --";
+                    return "󰸈";
 
                 var pct = Math.round(sink.audio.volume * 100);
                 if (sink.audio.muted)
-                    return "󰸈 " + pct + "%";
+                    return "󰸈";
 
                 if (pct > 66)
-                    return "󰕾 " + pct + "%";
+                    return "󰕾";
 
                 if (pct > 33)
-                    return "󰖀 " + pct + "%";
+                    return "󰖀"
 
-                return "󰕿 " + pct + "%";
+                return "󰕿";
             }
             color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
 

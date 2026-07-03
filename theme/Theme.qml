@@ -16,15 +16,15 @@ QtObject {
     readonly property int barPadding: 6
     readonly property int pillHeight: 20
     readonly property int btnHeight: 30
-    readonly property int widgetPadding: 10
-    readonly property int widgetRadius: 8
+    readonly property int widgetPadding: 6
+    readonly property int widgetRadius: 12
     readonly property string holoFont: "Share Tech Mono"
     // ─────────────────────────────────────────────────────────────
     // 2. YOUR NEW DESIGN SYSTEMS (Inline to lock them from formatters)
     // ─────────────────────────────────────────────────────────────
     readonly property QtObject
     base: QtObject {
-        readonly property color bg: "#1c1c1c"
+        readonly property color bg: "#171717"
         readonly property color surface: "#141414"
         readonly property color text: "#e6e6e6"
         readonly property color textAccent: "#1c1c1c"

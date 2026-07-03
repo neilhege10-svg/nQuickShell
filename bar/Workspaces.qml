@@ -120,9 +120,9 @@ RowLayout {
             Rectangle {
                 id: button
 
-                width: isActive ? 56 : 28
+                width: isActive ? 56 : 20
                 height: isActive ? t.pillHeight : 18
-                radius: 14
+                radius: 16
                 color: isActive ? (root.t ? root.t.base.accent : "#cba6f7") : (root.t ? root.t.base.surface : "#191926")
 
 //-----------------------------------------------------------------------------------
@@ -175,8 +175,8 @@ RowLayout {
                 // animates the WIDTH of the pill, making the pill of active workspaces wider
                 Behavior on width {
                     NumberAnimation {
-                        duration: 600
-                        easing.type: Easing.OutElastic
+                        duration: 300
+                        easing.type: Easing.Out
                         easing.amplitude: 0.25
                         easing.period: 0.4
                     }

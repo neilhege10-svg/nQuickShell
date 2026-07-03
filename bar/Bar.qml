@@ -32,12 +32,13 @@ PanelWindow {
         id: theme
     }
 
+    // this determines the height and width of the bar
     Item {
         id: dockContainer
 
         anchors.horizontalCenter: parent.horizontalCenter
-        height: theme.barHeight - 2
-        width: contentLayout.implicitWidth + 800
+        height: theme.barHeight - 1
+        width: contentLayout.implicitWidth + 600
 //--------------------------------------------------------------------------------------
 // MAIN SHAPE OF THE BAR
 //--------------------------------------------------------------------------------------

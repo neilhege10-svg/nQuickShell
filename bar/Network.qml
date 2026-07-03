@@ -14,8 +14,8 @@ Item {
 //-----------------------------------------------------------------------------------
 // Tell the Bar's RowLayout exactly how much space this module needs
 //-----------------------------------------------------------------------------------
-    implicitWidth: netLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
-    implicitHeight: t ? t.pillHeight : 32 // FIXED: Changed theme.pillHeight to t.pillHeight
+    implicitHeight: t ? t.pillHeight : 32
+    implicitWidth: netLabel.implicitWidth + (4 * 2)
 
 //-----------------------------------------------------------------------------------
 // this is the Glow effect, it activates when the module is clicked
@@ -49,8 +49,8 @@ Item {
         id: pill
 
         anchors.fill: parent
-        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 12 : (t ? t.widgetRadius : 8)
-        color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.base.accent : "#b4befe") : (t ? t.base.surface : "#313244")
+        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.widgetRadius : 12) : (t ? t.widgetRadius : 12)
+        color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.base.accent : "#b4befe") : ("transparent")
         scale: mouseArea.pressed ? 0.9 : 1
         
 //-----------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ Item {
                         root.netIcon = "󰤨";
                         root.netName = name.split(" ");
                     } else if (type === "802-3-ethernet") {
-                        root.netIcon = "󰈀"; 
+                        root.netIcon = "󰤨"; 
                         root.netName = "LAN"; 
                     } else {
                         root.netIcon = "󰤨";
@@ -100,9 +100,13 @@ Item {
         Text {
             id: netLabel
 
+            //if you to display the Wifi name change the text to "text: root.netIcon + " " + root.netName"
+            text: root.netIcon
+
             anchors.centerIn: parent
-            text: root.netIcon + " " + root.netName
-            color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
+            anchors.horizontalCenterOffset: -0.6
+            anchors.verticalCenterOffset: 0.5
+            color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
 
             font {
                 pixelSize: root.t ? root.t.fontSize : 13
