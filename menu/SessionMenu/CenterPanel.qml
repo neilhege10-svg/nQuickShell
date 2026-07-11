@@ -53,13 +53,13 @@ PanelWindow {
     Item {
         id: menuShape
 
-        property int menuWidth: 900
+        property int menuWidth: 750
         property int menuHeight: 200
         property real openAmount: PanelState.cPanelOpen ? 1 : 0
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: theme.barHeight - 4
+        anchors.topMargin: theme.barHeight - 6
         width: menuWidth
         height: menuHeight
 
