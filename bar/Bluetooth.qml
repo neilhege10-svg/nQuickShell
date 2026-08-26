@@ -102,7 +102,7 @@ Item {
 
             layer.enabled: true
             layer.effect: ColorOverlay {
-            color: root.t ? root.t.base.accent : "#cdd6f4"
+            color: root.t ? root.t.base.textAccent : "#cdd6f4"
             }
         }
 

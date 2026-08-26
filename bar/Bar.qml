@@ -190,30 +190,30 @@ RowLayout {
                 // Subtle shadow effect to lift the pill
 
             DropShadow {
-                anchors.fill: button
+                anchors.fill: controlPill
                 horizontalOffset: 2
                 verticalOffset: 2
                 radius: 8
                 samples: 17
                 color: "#60000000"
-                source: button
-                visible: delegateRoot.shouldShow
+                source: controlPill
+                visible: true
             }
                 Rectangle {
                     id: controlPill
 
                     anchors.fill: parent
-                    implicitWidth: controlLayout.implicitWidth + 22
+                    implicitWidth: controlLayout.implicitWidth + 19
                     implicitHeight: theme ? theme.pillHeight : 28
 
                     radius: theme ? theme.widgetRadius : 10
-                    color: theme ? theme.base.surface : "#313244"
+                    color: theme ? theme.base.accent : "#313244"
 
                     RowLayout {
                         id: controlLayout
 
                         anchors.centerIn: parent
-                        spacing: 7 // Tight padding between status icons inside this group
+                        spacing: 6 // Tight padding between status icons inside this group
 
                         Volume {
                             t: theme

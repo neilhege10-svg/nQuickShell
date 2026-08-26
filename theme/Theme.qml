@@ -25,7 +25,7 @@ QtObject {
     readonly property QtObject
     base: QtObject {
         readonly property color bg: "#171717"
-        readonly property color surface: "#242424"
+        readonly property color surface: "#1f1f1f"
         readonly property color text: "#e6e6e6"
         readonly property color textAccent: "#1c1c1c"
         readonly property color textInactive: "#6e6e6e"
