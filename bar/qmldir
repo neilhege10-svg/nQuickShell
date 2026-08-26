@@ -6,3 +6,4 @@ Network 1.0 Network.qml
 SystemStats 1.0 SystemStats.qml
 Battery 1.0 Battery.qml
 Bluetooth 1.0 Bluetooth.qml
+Notifications 1.0 Notifications.qml

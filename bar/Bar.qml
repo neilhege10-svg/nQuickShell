@@ -155,7 +155,7 @@ PanelWindow {
         RowLayout {
             id: contentLayout
 
-            spacing: theme.spacing
+            spacing: 2
 
             anchors {
                 fill: parent
@@ -187,6 +187,10 @@ PanelWindow {
             }
 
             Network {
+                t: theme
+            }
+
+            Notifications {
                 t: theme
             }
 

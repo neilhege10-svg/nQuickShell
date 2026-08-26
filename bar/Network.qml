@@ -70,7 +70,7 @@ Item {
 
                         // 1. Ethernet Connected -> Highest Priority
                         if (type === "802-3-ethernet") {
-                            root.netIcon = "../svg/cable.svg";
+                            root.netIcon = "../svg/ethernet.svg";
                             root.netName = "LAN";
                             return;
                         }
