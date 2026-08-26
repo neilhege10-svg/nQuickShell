@@ -1,5 +1,4 @@
 import "../state"
-import Qt5Compat.GraphicalEffects
 import QtQuick
 import Quickshell.Io
 
@@ -11,28 +10,10 @@ Item {
     property string bellIcon: "../svg/bell.svg"
     property bool isDnd: false
 
-    // Space requirements for RowLayout
+    // ── LAYOUT BOUNDS ────────────────────────────────────
+    // Keeps layout footprint tight to preserve RowLayout spacing
     implicitHeight: t ? t.pillHeight : 32
-    implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
-
-    // ── GLOW / SHADOW EFFECT ─────────────────────────────
-    DropShadow {
-        anchors.fill: pill
-        horizontalOffset: 3
-        verticalOffset: 2
-        radius: 8
-        samples: 17
-        color: "#000000"
-        source: pill
-        opacity: mouseArea.pressed ? 0.6 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-                easing.type: Easing.InOutQuad
-            }
-        }
-    }
+    implicitWidth: bellLabel.width
 
     // ── MAIN PILL CONTAINER ──────────────────────────────
     Rectangle {
@@ -86,7 +67,7 @@ Item {
 
             source: root.bellIcon
 
-            readonly property int iconDimension: root.t ? root.t.fontSize : 16
+            readonly property int iconDimension: root.t ? root.t.fontSize - 1 : 15
             width: iconDimension
             height: iconDimension
             sourceSize.width: iconDimension
@@ -97,17 +78,6 @@ Item {
             fillMode: Image.PreserveAspectFit
             smooth: true
             mipmap: true
-
-            layer.enabled: true
-            layer.effect: ColorOverlay {
-                color: root.t ? root.t.base.text : "#cdd6f4"
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 300
-                    }
-                }
-            }
         }
 
         Behavior on color {
@@ -127,7 +97,16 @@ Item {
     MouseArea {
         id: mouseArea
 
-        anchors.fill: parent
+        // Expands touch target by 10px on each side into RowLayout spacing
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            leftMargin: -10
+            rightMargin: -10
+        }
+
         cursorShape: Qt.PointingHandCursor
 
         onClicked: {

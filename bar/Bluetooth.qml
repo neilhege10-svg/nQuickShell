@@ -1,7 +1,7 @@
 import "../state"
-import Qt5Compat.GraphicalEffects
 import QtQuick
 import Quickshell.Io
+import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -11,28 +11,10 @@ Item {
     property string btIcon: "../svg/bluetooth-off.svg"
     property string btState: "off"
 
-    // Space requirements for RowLayout (matches Network & Volume)
+    // ── LAYOUT BOUNDS ────────────────────────────────────
+    // Keeps layout footprint tight to preserve RowLayout spacing
     implicitHeight: t ? t.pillHeight : 32
-    implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
-
-    // ── GLOW / SHADOW EFFECT ─────────────────────────────
-    DropShadow {
-        anchors.fill: pill
-        horizontalOffset: 3
-        verticalOffset: 2
-        radius: 8
-        samples: 17
-        color: "#000000"
-        source: pill
-        opacity: mouseArea.pressed ? 0.6 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-                easing.type: Easing.InOutQuad
-            }
-        }
-    }
+    implicitWidth: btLabel.width
 
     // ── MAIN PILL CONTAINER ──────────────────────────────
     Rectangle {
@@ -50,11 +32,10 @@ Item {
             }
         }
 
-        // ── PROCESS 1: Check Bluetooth Power & Connection Status ──────
+        // ── PROCESS 1: Check Bluetooth Status ────────────────
         Process {
             id: btProc
 
-            // Outputs single-line JSON: {"powered":"yes|no", "connected":"yes|no"}
             command: ["bash", "-c", "POWERED=$(bluetoothctl show | grep 'Powered:' | awk '{print $2}'); [ -z \"$POWERED\" ] && POWERED=\"no\"; CONNECTED=$(bluetoothctl info 2>/dev/null | grep 'Connected:' | grep -q 'yes' && echo 'yes' || echo 'no'); echo \"{\\\"powered\\\":\\\"$POWERED\\\",\\\"connected\\\":\\\"$CONNECTED\\\"}\""]
             running: true
 
@@ -90,8 +71,6 @@ Item {
             id: btToggleProc
 
             command: ["bash", "-c", root.btState === "off" ? "bluetoothctl power on" : "bluetoothctl power off"]
-            
-            // Re-check Bluetooth status after toggle action finishes
             onExited: btProc.running = true
         }
 
@@ -109,7 +88,7 @@ Item {
 
             source: root.btIcon
 
-            readonly property int iconDimension: root.t ? root.t.fontSize : 16
+            readonly property int iconDimension: root.t ? root.t.fontSize - 1 : 15
             width: iconDimension
             height: iconDimension
             sourceSize.width: iconDimension
@@ -123,13 +102,7 @@ Item {
 
             layer.enabled: true
             layer.effect: ColorOverlay {
-                color: root.t ? root.t.base.text : "#cdd6f4"
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 300
-                    }
-                }
+            color: root.t ? root.t.base.accent : "#cdd6f4"
             }
         }
 
@@ -146,11 +119,20 @@ Item {
         }
     }
 
-    // ── CLICK INTERACTION (TOGGLE POWER) ─────────────────
+    // ── CLICK INTERACTION ────────────────────────────────
     MouseArea {
         id: mouseArea
 
-        anchors.fill: parent
+        // Expands touch target by 10px on each side into RowLayout spacing
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            leftMargin: -10
+            rightMargin: -10
+        }
+
         cursorShape: Qt.PointingHandCursor
 
         onClicked: {

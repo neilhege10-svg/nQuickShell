@@ -133,20 +133,26 @@ PanelWindow {
 // the Clock Widget, it is seperated from contentLayout so that
 // it can be anchored to the center of the bar
 //--------------------------------------------------------------------------------------
+RowLayout {
+  id: centerLayout
+  spacing : 0
+
+  anchors {
+    horizontalCenter: parent.horizontalCenter
+    verticalCenter: contentLayout.verticalCenter
+    topMargin: 2
+    bottomMargin: 2
+  }
+        Notifications {
+          id: notifBell
+          t: theme
+        }
         Clock {
             id: clockWidget
-
             t: theme
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                verticalCenter: contentLayout.verticalCenter
-                topMargin: 2
-                bottomMargin: 2
-            }
-
         }
 
+      }
 //--------------------------------------------------------------------------------------
 // This is the bar's RowLayout it contains all the Modules inside a typical bar
 // like Bluetooth, systats, wifi, etc. it is specifically anchored to the lef and right
@@ -174,28 +180,56 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
-            Battery {
-                t: theme
-            }
+// ── CONTROL STATUS TRAIL PILL ────────────────────────
 
-            Bluetooth {
-                t: theme
-            }
+            Item {
+                Layout.alignment: Qt.AlignVCenter
+                implicitWidth: controlPill.implicitWidth
+                implicitHeight: controlPill.implicitHeight
 
-            Volume {
-                t: theme
-            }
+                // Subtle shadow effect to lift the pill
 
-            Network {
-                t: theme
+            DropShadow {
+                anchors.fill: button
+                horizontalOffset: 2
+                verticalOffset: 2
+                radius: 8
+                samples: 17
+                color: "#60000000"
+                source: button
+                visible: delegateRoot.shouldShow
             }
+                Rectangle {
+                    id: controlPill
 
-            Notifications {
-                t: theme
+                    anchors.fill: parent
+                    implicitWidth: controlLayout.implicitWidth + 22
+                    implicitHeight: theme ? theme.pillHeight : 28
+
+                    radius: theme ? theme.widgetRadius : 10
+                    color: theme ? theme.base.surface : "#313244"
+
+                    RowLayout {
+                        id: controlLayout
+
+                        anchors.centerIn: parent
+                        spacing: 7 // Tight padding between status icons inside this group
+
+                        Volume {
+                            t: theme
+                        }
+
+                        Network {
+                            t: theme
+                        }
+
+                        Bluetooth {
+                            t: theme
+                        }
+                    }
+                }
             }
-
         }
-
 //--------------------------------------------------------------------------------------
 // This is the SIDE BUTTONS these are 2 extra buttons that lives outside the bar
 // theyre anchored to the contentLayout above but are margined to the left and right

@@ -1,6 +1,8 @@
 import "../state"
+import QtQuick.Effects
 import Qt5Compat.GraphicalEffects
 import QtQuick
+import QtQuick.Layouts
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 
@@ -25,30 +27,12 @@ Item {
         return "../svg/volume.svg";
     }
 
-    // Space requirements for RowLayout
+    // ── LAYOUT BOUNDS ────────────────────────────────────
+    // Keeps layout tight based strictly on the icon size
     implicitHeight: t ? t.pillHeight : 32
-    implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
+    implicitWidth: volLabel.width
 
-    // ── GLOW / SHADOW EFFECT ─────────────────────────────
-    DropShadow {
-        anchors.fill: pill
-        horizontalOffset: 3
-        verticalOffset: 2
-        radius: 8
-        samples: 17
-        color: "#000000"
-        source: pill
-        opacity: mouseArea.pressed ? 0.6 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-                easing.type: Easing.InOutQuad
-            }
-        }
-    }
-
-    // ── MAIN PILL CONTAINER ──────────────────────────────
+    // ── MAIN CONTAINER ───────────────────────────────────
     Rectangle {
         id: pill
 
@@ -69,7 +53,7 @@ Item {
             objects: [Pipewire.defaultAudioSink]
         }
 
-        // Process executing mute toggle across ALL sinks on ANY machine
+        // Process executing mute toggle
         Process {
             id: muteToggleProc
             command: ["bash", "-c", "for s in $(pactl list short sinks | awk '{print $1}'); do pactl set-sink-mute \"$s\" toggle; done"]
@@ -81,7 +65,7 @@ Item {
 
             source: root.volIcon
 
-            readonly property int iconDimension: root.t ? root.t.fontSize : 16
+            readonly property int iconDimension: root.t ? root.t.fontSize - 1 : 15
             width: iconDimension
             height: iconDimension
             sourceSize.width: iconDimension
@@ -95,13 +79,7 @@ Item {
 
             layer.enabled: true
             layer.effect: ColorOverlay {
-                color: root.t ? root.t.base.text : "#cdd6f4"
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 300
-                    }
-                }
+            color: root.t ? root.t.base.accent : "#cdd6f4"
             }
         }
 
@@ -122,7 +100,16 @@ Item {
     MouseArea {
         id: mouseArea
 
-        anchors.fill: parent
+        // Expands hit box by 10px on left/right into empty RowLayout spacing
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            leftMargin: -10
+            rightMargin: -10
+        }
+
         cursorShape: Qt.PointingHandCursor
 
         onClicked: {

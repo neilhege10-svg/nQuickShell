@@ -1,7 +1,7 @@
 import "../state"
-import Qt5Compat.GraphicalEffects
 import QtQuick
 import Quickshell.Io
+import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -11,30 +11,12 @@ Item {
     property string netIcon: "../svg/wifi-off.svg"
     property string netName: "..."
 
-    // Tell the Bar's RowLayout how much space this module needs
+    // ── LAYOUT BOUNDS ────────────────────────────────────
+    // Layout footprint targets exact icon size to preserve RowLayout spacing
     implicitHeight: t ? t.pillHeight : 32
-    implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
+    implicitWidth: netLabel.width
 
-    // ── GLOW / SHADOW EFFECT ─────────────────────────────
-    DropShadow {
-        anchors.fill: pill
-        horizontalOffset: 3
-        verticalOffset: 2
-        radius: 8
-        samples: 17
-        color: "#000000"
-        source: pill
-        opacity: mouseArea.pressed ? 0.6 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 150
-                easing.type: Easing.InOutQuad
-            }
-        }
-    }
-
-    // ── MAIN PILL CONTAINER ──────────────────────────────
+    // ── MAIN CONTAINER ───────────────────────────────────
     Rectangle {
         id: pill
 
@@ -50,11 +32,10 @@ Item {
             }
         }
 
-        // ── PROCESS 1: Check Network & Wi-Fi Radio Status ──────
+        // ── PROCESS 1: Check Network Status ──────────────────
         Process {
             id: netProc
 
-            // Outputs single-line JSON: {"type":"802-3-ethernet|802-11-wireless|none", "wifi":"enabled|disabled"}
             command: ["bash", "-c", "TYPE=$(nmcli -t -f TYPE,STATE connection show --active 2>/dev/null | grep ':activated' | head -1 | cut -d: -f1); [ -z \"$TYPE\" ] && TYPE=\"none\"; WIFI=$(nmcli radio wifi 2>/dev/null); echo \"{\\\"type\\\":\\\"$TYPE\\\",\\\"wifi\\\":\\\"$WIFI\\\"}\""]
             running: true
 
@@ -68,21 +49,18 @@ Item {
                         var type = res.type || "none";
                         var wifiState = res.wifi || "disabled";
 
-                        // 1. Ethernet Connected -> Highest Priority
                         if (type === "802-3-ethernet") {
                             root.netIcon = "../svg/ethernet.svg";
                             root.netName = "LAN";
                             return;
                         }
 
-                        // 2. Wi-Fi Connected
                         if (type === "802-11-wireless") {
                             root.netIcon = "../svg/wifi.svg";
                             root.netName = "WiFi";
                             return;
                         }
 
-                        // 3. Wi-Fi Radio Powered Off or Disconnected
                         root.netIcon = "../svg/wifi-off.svg";
                         root.netName = (wifiState === "disabled") ? "Off" : "Disconnected";
                     } catch (e) {
@@ -97,8 +75,6 @@ Item {
             id: wifiToggleProc
 
             command: ["bash", "-c", root.netIcon === "../svg/wifi-off.svg" ? "nmcli radio wifi on" : "nmcli radio wifi off"]
-            
-            // Re-run status check once toggle completes
             onExited: netProc.running = true
         }
 
@@ -116,8 +92,7 @@ Item {
 
             source: root.netIcon
             
-            // Scaled down to match font size cleanly (change 'fontSize' or subtract if still too big)
-            readonly property int iconDimension: root.t ? root.t.fontSize : 16
+            readonly property int iconDimension: root.t ? root.t.fontSize - 1 : 15
             width: iconDimension
             height: iconDimension
             sourceSize.width: iconDimension
@@ -131,14 +106,9 @@ Item {
 
             layer.enabled: true
             layer.effect: ColorOverlay {
-                color: root.t ? root.t.base.text : "#cdd6f4"
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 300
-                    }
-                }
+            color: root.t ? root.t.base.accent : "#cdd6f4"
             }
+
         }
 
         Behavior on color {
@@ -158,9 +128,16 @@ Item {
     MouseArea {
         id: mouseArea
 
-        anchors.fill: parent
+        // Expands touch target by 10px on each side without pushing neighbors
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            leftMargin: -10
+            rightMargin: -10
+        }
         
-        // Pointer cursor for Wi-Fi / Disconnected, Arrow cursor for Ethernet
         cursorShape: root.netName === "LAN" ? Qt.ArrowCursor : Qt.PointingHandCursor
 
         onClicked: {

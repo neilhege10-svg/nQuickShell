@@ -7,15 +7,15 @@ import Quickshell.Hyprland
 RowLayout {
     id: root
 
-// ── CORE PROPERTIES ──────────────────────────────────
+    // ── CORE PROPERTIES ──────────────────────────────────
     property var monitor
     property var t
 
-//-----------------------------------------------------------------------------------
-// This section changes the corresponding workspace to a title of icon 
-// eg. [ "8": "󰺷 ", ] this makes it so that workspace 8
-// is indicated by a game controller icon instead of just the number 8
-//-----------------------------------------------------------------------------------
+    // Signal emitted when clicking the pill (prepped for your future WP Overview overlay)
+    signal overviewRequested()
+
+    // ── WORKSPACE NAMES / ICONS MAP ──────────────────────
+    // Add full strings anytime (e.g., "1": "1 • Main", "8": "󰺷 Gaming")
     readonly property var workspaceIcons: ({
         "1": "1",
         "2": "2",
@@ -29,164 +29,88 @@ RowLayout {
         "10": "󰺷 "
     })
 
-    spacing: 4
+    spacing: 0
 
-//-----------------------------------------------------------------------------------
-// THE WORKSPACE REPEATER - This is the magic that creates all the workspace pills
-// 
-// How it works:
-// - Hyprland.workspaces gives us a list of ALL workspaces that exist
-// - For EACH workspace in that list, this Repeater creates one "delegate" (the pill below)
-// - modelData contains the info for that specific workspace (id, monitor, etc.)
-// - We then check: "Does this workspace belong on THIS monitor?"
-// - If yes, show it. If no, hide it (width: 0, visible: false)
-//
-// Why this matters for multi-monitor:
-// Without this filtering, BOTH monitors would show ALL workspaces (1-10)
-// With this, Monitor 1 only shows workspaces assigned to Monitor 1
-// and Monitor 2 only shows workspaces assigned to Monitor 2
-//-----------------------------------------------------------------------------------
+    // ── WORKSPACE REPEATER ───────────────────────────────
     Repeater {
         model: Hyprland.workspaces
 
-        // -----------------------------------------------------------------
-        // THE MULTI-MONITOR MULTI-LIGHT FIX:
-        // 
-        // This checks TWO things:
-        // 1. belongsHere: "Is this workspace assigned to the monitor I'm on?"
-        //    - If root.monitor exists, check if modelData.monitor.id matches root.monitor.id
-        //    - If no monitor specified, show everything (fallback for single monitor)
-        //
-        // 2. isActive: "Is this workspace currently FOCUSED on its monitor?"
-        //    - Each monitor has its own activeWorkspace
-        //    - We check if this workspace's id matches the active workspace id
-        //    - This ensures both monitors can show their own active workspace
-        //      (not just one global "active" workspace)
-        // -----------------------------------------------------------------
         delegate: Item {
+            id: delegateRoot
+
             required property var modelData
+
+            // Is this workspace active on its monitor?
             property bool isActive: modelData.monitor && modelData.monitor.activeWorkspace ? modelData.monitor.activeWorkspace.id === modelData.id : false
+
+            // Does this workspace belong to the monitor this bar is on?
             property bool belongsHere: root.monitor ? modelData.monitor.id === root.monitor.id : true
 
-            implicitWidth: belongsHere ? button.width : 0
-            implicitHeight: button.height
-            visible: belongsHere
-            width: belongsHere ? button.width : 0
-            height: button.height
+            // STRICT VISIBILITY: Show ONLY if it belongs to this monitor AND is active
+            property bool shouldShow: belongsHere && isActive
 
-//-----------------------------------------------------------------------------------
-// this is the shadow effect, it activates for the current active workspace
-// by using [ visible: isActive ]
-//-----------------------------------------------------------------------------------
+            visible: shouldShow
+            implicitWidth: shouldShow ? button.width : 0
+            implicitHeight: shouldShow ? button.height : 0
+            width: shouldShow ? button.width : 0
+            height: shouldShow ? button.height : 0
+
+            // ── DROP SHADOW ──────────────────────────────────
             DropShadow {
                 anchors.fill: button
-                horizontalOffset: isActive ? 3 : 0
-                verticalOffset: isActive ? 2 : 0
-                radius: isActive ? 8 : 0
+                horizontalOffset: 2
+                verticalOffset: 2
+                radius: 8
                 samples: 17
-                color: "#000000"
+                color: "#60000000"
                 source: button
-                visible: isActive
-
-                // animates the shadow's horizontalOffset
-                Behavior on horizontalOffset {
-                    NumberAnimation {
-                        duration: 400
-                    }
-
-                }
-
-                // animates the shadow's verticalOffset
-                Behavior on verticalOffset {
-                    NumberAnimation {
-                        duration: 400
-                    }
-
-                }
-
-                // animates the shadow's Radius
-                Behavior on radius {
-                    NumberAnimation {
-                        duration: 400
-                    }
-
-                }
-
+                visible: delegateRoot.shouldShow
             }
 
-//-----------------------------------------------------------------------------------
-// Main shape and design of the Workspace module
-//-----------------------------------------------------------------------------------
+            // ── ACTIVE WORKSPACE PILL ────────────────────────
             Rectangle {
                 id: button
 
-                width: isActive ? 56 : 20
-                height: isActive ? t.pillHeight : 18
+                // Dynamic width: Fits label + padding, with a 56px minimum floor
+                width: Math.max(56, label.implicitWidth + 24)
+                height: root.t ? root.t.pillHeight : 28
                 radius: 16
-                color: isActive ? (root.t ? root.t.base.accent : "#cba6f7") : (root.t ? root.t.base.surface : "#191926")
 
-//-----------------------------------------------------------------------------------
-// Main Text design of the Workspace module
-//-----------------------------------------------------------------------------------
-                Text {
-                    anchors.centerIn: parent
-                    text: root.workspaceIcons[modelData.id] || modelData.id
-                    // Fixed: Replaced "transparent" fallback with a visible dim color
-                    // so you can actually read the icons/numbers when inactive
-                    color: isActive ? (root.t ? root.t.base.textAccent : "#cdd6f4") : "transparent"
+                color: root.t ? root.t.base.accent : "#00b4ff"
 
-                    font {
-                        pixelSize: 16
-                        family: root.t ? root.t.fontFamily : ""
-                        bold: isActive
+                // Animate width expansion smoothly when switching to workspaces with longer names
+                Behavior on width {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
                     }
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 400
-                        }
-
-                    }
-
                 }
 
-//-----------------------------------------------------------------------------------
-// The mouseArea section is what makes the module CLICKABLE by using onClicked property
-// it uses Hyperland's dispatcher to switch to the corresponding workspace id
-// upon clicking one it turns into an Active state, changing the colors and design
-// of the active workspace and applying animations to it
-//-----------------------------------------------------------------------------------
+                // ── DISPLAY TEXT ─────────────────────────────
+                Text {
+                    id: label
+
+                    anchors.centerIn: parent
+                    text: root.workspaceIcons[modelData.id] || modelData.id
+                    color: root.t ? root.t.base.textAccent : "#11111b"
+
+                    font {
+                        pixelSize: 15
+                        family: root.t ? root.t.fontFamily : ""
+                        bold: true
+                    }
+                }
+
+                // ── CLICK INTERACTION ────────────────────────
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
+
                     onClicked: {
-                        Hyprland.dispatch("hl.dsp.focus({ workspace = \"" + modelData.id + "\" })");
+                        root.overviewRequested();
                     }
                 }
-
-                // animation for the color of the module's Pill
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 400
-                    }
-
-                }
-
-                // animates the WIDTH of the pill, making the pill of active workspaces wider
-                Behavior on width {
-                    NumberAnimation {
-                        duration: 300
-                        easing.type: Easing.Out
-                        easing.amplitude: 0.25
-                        easing.period: 0.4
-                    }
-
-                }
-
             }
-
         }
-
     }
-
 }
