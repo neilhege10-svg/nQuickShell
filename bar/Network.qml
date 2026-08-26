@@ -6,21 +6,16 @@ import Quickshell.Io
 Item {
     id: root
 
-// ── CORE PROPERTIES ──────────────────────────────────
+    // ── CORE PROPERTIES ──────────────────────────────────
     property var t
-    property string netIcon: "󰤨"
+    property string netIcon: "../svg/wifi-off.svg"
     property string netName: "..."
 
-//-----------------------------------------------------------------------------------
-// Tell the Bar's RowLayout exactly how much space this module needs
-//-----------------------------------------------------------------------------------
+    // Tell the Bar's RowLayout how much space this module needs
     implicitHeight: t ? t.pillHeight : 32
     implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
 
-//-----------------------------------------------------------------------------------
-// this is the Glow effect, it activates when the module is clicked
-// by using PanelState in the opacity
-//-----------------------------------------------------------------------------------
+    // ── GLOW / SHADOW EFFECT ─────────────────────────────
     DropShadow {
         anchors.fill: pill
         horizontalOffset: 3
@@ -29,81 +24,101 @@ Item {
         samples: 17
         color: "#000000"
         source: pill
-        opacity: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? 1 : 0
+        opacity: mouseArea.pressed ? 0.6 : 0
 
-        // animation for the shadow on the module
         Behavior on opacity {
             NumberAnimation {
-                duration: 200
+                duration: 150
                 easing.type: Easing.InOutQuad
             }
-
         }
-
     }
 
-//-----------------------------------------------------------------------------------
-// Main shape and design of the Network module
-//-----------------------------------------------------------------------------------
+    // ── MAIN PILL CONTAINER ──────────────────────────────
     Rectangle {
         id: pill
 
         anchors.fill: parent
-        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.widgetRadius : 12) : (t ? t.widgetRadius : 12)
-        color: PanelState.rPanelOpen && PanelState.rPanelPage === "network" ? (t ? t.base.accent : "#b4befe") : ("transparent")
-        scale: mouseArea.pressed ? 0.9 : 1
-        
-//-----------------------------------------------------------------------------------
-// Main Process of the Network module
-//-----------------------------------------------------------------------------------
+        radius: t ? t.widgetRadius : 12
+        color: "transparent"
+        scale: mouseArea.pressed ? 0.88 : 1.0
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: 120
+                easing.type: Easing.OutQuad
+            }
+        }
+
+        // ── PROCESS 1: Check Network & Wi-Fi Radio Status ──────
         Process {
             id: netProc
 
-            command: ["bash", "-c", "nmcli -t -f NAME,TYPE,STATE connection show --active 2>/dev/null | grep ':activated' | head -1"]
+            // Returns active connection type AND wifi radio status
+            command: ["bash", "-c", "nmcli -t -f TYPE,STATE connection show --active 2>/dev/null | grep ':activated' | head -1; nmcli radio wifi"]
             running: true
 
             stdout: SplitParser {
                 onRead: (data) => {
-                    var parts = data.trim().split(":");
-                    if (parts.length < 3) {
-                        root.netIcon = "󰖪";
+                    var lines = data.trim().split("\n");
+                    var activeLine = lines[0] || "";
+                    var wifiRadio = lines[1] ? lines[1].trim() : "enabled";
+
+                    var parts = activeLine.split(":");
+
+                    // 1. Ethernet Connected -> Take Priority
+                    if (parts.length >= 2 && parts[0] === "802-3-ethernet") {
+                        root.netIcon = "../svg/ethernet.svg";
+                        root.netName = "LAN";
+                        return;
+                    }
+
+                    // 2. Wi-Fi Radio Powered OFF
+                    if (wifiRadio === "disabled") {
+                        root.netIcon = "../svg/wifi-off.svg";
                         root.netName = "Off";
-                        return ;
+                        return;
                     }
-                    var type = parts[1];
-                    var name = parts[0];
-                    if (type === "802-11-wireless") {
-                        root.netIcon = "󰤨";
-                        root.netName = name.split(" ");
-                    } else if (type === "802-3-ethernet") {
-                        root.netIcon = "󰤨"; 
-                        root.netName = "LAN"; 
-                    } else {
-                        root.netIcon = "󰤨";
-                        root.netName = name.split(" ");
+
+                    // 3. Wi-Fi Powered ON & Connected
+                    if (parts.length >= 2 && parts[0] === "802-11-wireless") {
+                        root.netIcon = "../svg/wifi-high.svg";
+                        root.netName = "WiFi";
+                        return;
                     }
+
+                    // 4. Disconnected / Unknown
+                    root.netIcon = "../svg/wifi-off.svg";
+                    root.netName = "Disconnected";
                 }
             }
-
         }
 
+        // ── PROCESS 2: Toggle Wi-Fi Power ────────────────────
+        Process {
+            id: wifiToggleProc
+
+            // Turns wifi ON if currently off, or OFF if currently on
+            command: ["bash", "-c", root.netIcon === "../svg/wifi-off.svg" ? "nmcli radio wifi on" : "nmcli radio wifi off"]
+            
+            // Re-run status check once toggle finishes
+            onExited: netProc.running = true
+        }
+
+        // ── AUTO-REFRESH TIMER ──────────────────────────────
         Timer {
-            interval: 15000
+            interval: 10000
             repeat: true
             running: true
             onTriggered: netProc.running = true
         }
 
-//-----------------------------------------------------------------------------------
-// Main Text design of the Network module
-//-----------------------------------------------------------------------------------
+        // ── ICON DISPLAY ─────────────────────────────────────
         Image {
             id: netLabel
 
-            //if you to display the Wifi name change the text to "text: root.netIcon + " " + root.netName"
-
-            source: "../svg/wifi-high.svg"
-            width: root.t? root.t.fontSize + 4 : 18
+            source: root.netIcon
+            width: root.t ? root.t.fontSize + 4 : 18
             height: width
 
             anchors.centerIn: parent
@@ -111,56 +126,43 @@ Item {
 
             layer.enabled: true
             layer.effect: ColorOverlay {
-              color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
+                color: root.t ? root.t.base.text : "#cdd6f4"
 
-              Behavior on color {
-                ColorAnimation {
-                  duration: 400
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 300
+                    }
                 }
-
-              }
             }
-
         }
 
-        // animation for the color of the module
         Behavior on color {
             ColorAnimation {
                 duration: 330
             }
-
         }
 
-        //animation for the radius of the module
         Behavior on radius {
             NumberAnimation {
                 duration: 330
             }
-
         }
-
     }
 
-//-----------------------------------------------------------------------------------
-// The mouseArea section is what makes the module CLICKABLE by using onClicked property
-// it changes the panelstate and other sections of the code can use the panelstate
-// to change the button's visual
-//-----------------------------------------------------------------------------------
+    // ── CLICK INTERACTION ────────────────────────────────
     MouseArea {
         id: mouseArea
 
         anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
+        
+        // Show pointer cursor unless connected via Ethernet
+        cursorShape: root.netName === "LAN" ? Qt.ArrowCursor : Qt.PointingHandCursor
+
         onClicked: {
-            if (!PanelState.rPanelOpen) {
-                // If the panel is closed, open it and set the page
-                PanelState.rPanelOpen = true;
-                PanelState.rPanelPage = "network";
-            } else {
-                // If it's already open, just make sure it switches to the network page
-                PanelState.rPanelPage = "network";
+            // Ignore click if on Ethernet, otherwise toggle Wi-Fi power
+            if (root.netName !== "LAN") {
+                wifiToggleProc.running = true;
             }
         }
     }
-
 }

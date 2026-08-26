@@ -37,7 +37,7 @@ Item {
             id: timeLabel
 
             anchors.centerIn: parent
-            text: Qt.formatDateTime(root.now, "hh:mm · ddd d")
+            text: Qt.formatDateTime(root.now, "hh:mm")
             color: root.t ? root.t.base.text : "#cdd6f4"
 
             font {

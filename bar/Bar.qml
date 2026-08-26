@@ -38,7 +38,7 @@ PanelWindow {
 
         anchors.horizontalCenter: parent.horizontalCenter
         height: theme.barHeight - 1
-        width: contentLayout.implicitWidth + 600
+        width: contentLayout.implicitWidth + 500
 //--------------------------------------------------------------------------------------
 // MAIN SHAPE OF THE BAR
 //--------------------------------------------------------------------------------------
@@ -161,8 +161,8 @@ PanelWindow {
                 fill: parent
                 leftMargin: 48
                 rightMargin: 48
-                topMargin: 2
-                bottomMargin: 2
+                topMargin: 3
+                bottomMargin: 3
             }
 
             Workspaces {
@@ -172,10 +172,6 @@ PanelWindow {
 
             Item {
                 Layout.fillWidth: true
-            }
-
-            SystemStats {
-                t: theme
             }
 
             Battery {

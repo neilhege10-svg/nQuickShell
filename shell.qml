@@ -16,16 +16,6 @@ ShellRoot {
 
     }
 
-    Variants {
-        model: Quickshell.screens
-
-        delegate: CenterPanel {
-            required property var modelData
-
-            targetScreen: modelData
-        }
-
-    }
 
     Variants {
         model: Quickshell.screens
