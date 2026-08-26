@@ -69,12 +69,10 @@ Item {
             objects: [Pipewire.defaultAudioSink]
         }
 
-        // Universal mute toggle:
-        // 1. Toggles all EVO sinks if present (Desktop fix)
-        // 2. Toggles default sink via wpctl/pactl fallback (Laptop fix)
+        // Process executing mute toggle across ALL sinks on ANY machine
         Process {
             id: muteToggleProc
-            command: ["bash", "-c", "EVO_SINKS=$(pactl list short sinks | grep -iE 'evo|evo8' | awk '{print $1}'); if [ -n \"$EVO_SINKS\" ]; then for s in $EVO_SINKS; do pactl set-sink-mute \"$s\" toggle; done; else wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle || pactl set-sink-mute @DEFAULT_SINK@ toggle; fi"]
+            command: ["bash", "-c", "for s in $(pactl list short sinks | awk '{print $1}'); do pactl set-sink-mute \"$s\" toggle; done"]
         }
 
         // ── ICON DISPLAY ─────────────────────────────────────
