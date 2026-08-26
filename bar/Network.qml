@@ -54,42 +54,40 @@ Item {
         Process {
             id: netProc
 
-            // Returns active connection type AND wifi radio status
-            command: ["bash", "-c", "nmcli -t -f TYPE,STATE connection show --active 2>/dev/null | grep ':activated' | head -1; nmcli radio wifi"]
+            // Outputs single-line JSON: {"type":"802-3-ethernet|802-11-wireless|none", "wifi":"enabled|disabled"}
+            command: ["bash", "-c", "TYPE=$(nmcli -t -f TYPE,STATE connection show --active 2>/dev/null | grep ':activated' | head -1 | cut -d: -f1); [ -z \"$TYPE\" ] && TYPE=\"none\"; WIFI=$(nmcli radio wifi 2>/dev/null); echo \"{\\\"type\\\":\\\"$TYPE\\\",\\\"wifi\\\":\\\"$WIFI\\\"}\""]
             running: true
 
             stdout: SplitParser {
                 onRead: (data) => {
-                    var lines = data.trim().split("\n");
-                    var activeLine = lines[0] || "";
-                    var wifiRadio = lines[1] ? lines[1].trim() : "enabled";
+                    var str = data.trim();
+                    if (!str.startsWith("{")) return;
 
-                    var parts = activeLine.split(":");
+                    try {
+                        var res = JSON.parse(str);
+                        var type = res.type || "none";
+                        var wifiState = res.wifi || "disabled";
 
-                    // 1. Ethernet Connected -> Take Priority
-                    if (parts.length >= 2 && parts[0] === "802-3-ethernet") {
-                        root.netIcon = "../svg/ethernet.svg";
-                        root.netName = "LAN";
-                        return;
-                    }
+                        // 1. Ethernet Connected -> Highest Priority
+                        if (type === "802-3-ethernet") {
+                            root.netIcon = "../svg/ethernet.svg";
+                            root.netName = "LAN";
+                            return;
+                        }
 
-                    // 2. Wi-Fi Radio Powered OFF
-                    if (wifiRadio === "disabled") {
+                        // 2. Wi-Fi Connected
+                        if (type === "802-11-wireless") {
+                            root.netIcon = "../svg/wifi-high.svg";
+                            root.netName = "WiFi";
+                            return;
+                        }
+
+                        // 3. Wi-Fi Radio Powered Off or Disconnected
                         root.netIcon = "../svg/wifi-off.svg";
-                        root.netName = "Off";
-                        return;
+                        root.netName = (wifiState === "disabled") ? "Off" : "Disconnected";
+                    } catch (e) {
+                        console.log("Network parsing error:", e);
                     }
-
-                    // 3. Wi-Fi Powered ON & Connected
-                    if (parts.length >= 2 && parts[0] === "802-11-wireless") {
-                        root.netIcon = "../svg/wifi-high.svg";
-                        root.netName = "WiFi";
-                        return;
-                    }
-
-                    // 4. Disconnected / Unknown
-                    root.netIcon = "../svg/wifi-off.svg";
-                    root.netName = "Disconnected";
                 }
             }
         }
@@ -98,10 +96,9 @@ Item {
         Process {
             id: wifiToggleProc
 
-            // Turns wifi ON if currently off, or OFF if currently on
             command: ["bash", "-c", root.netIcon === "../svg/wifi-off.svg" ? "nmcli radio wifi on" : "nmcli radio wifi off"]
             
-            // Re-run status check once toggle finishes
+            // Re-run status check once toggle completes
             onExited: netProc.running = true
         }
 
@@ -155,11 +152,10 @@ Item {
 
         anchors.fill: parent
         
-        // Show pointer cursor unless connected via Ethernet
+        // Pointer cursor for Wi-Fi / Disconnected, Arrow cursor for Ethernet
         cursorShape: root.netName === "LAN" ? Qt.ArrowCursor : Qt.PointingHandCursor
 
         onClicked: {
-            // Ignore click if on Ethernet, otherwise toggle Wi-Fi power
             if (root.netName !== "LAN") {
                 wifiToggleProc.running = true;
             }
