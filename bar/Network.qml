@@ -15,7 +15,7 @@ Item {
 // Tell the Bar's RowLayout exactly how much space this module needs
 //-----------------------------------------------------------------------------------
     implicitHeight: t ? t.pillHeight : 32
-    implicitWidth: netLabel.implicitWidth + (4 * 2)
+    implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
 
 //-----------------------------------------------------------------------------------
 // this is the Glow effect, it activates when the module is clicked
@@ -97,27 +97,28 @@ Item {
 //-----------------------------------------------------------------------------------
 // Main Text design of the Network module
 //-----------------------------------------------------------------------------------
-        Text {
+        Image {
             id: netLabel
 
             //if you to display the Wifi name change the text to "text: root.netIcon + " " + root.netName"
-            text: root.netIcon
+
+            source: "../svg/wifi-high.svg"
+            width: root.t? root.t.fontSize + 4 : 18
+            height: width
 
             anchors.centerIn: parent
-            anchors.horizontalCenterOffset: -0.6
-            anchors.verticalCenterOffset: 0.5
-            color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
+            anchors.verticalCenterOffset: -2
 
-            font {
-                pixelSize: root.t ? root.t.fontSize : 13
-                family: root.t ? root.t.fontFamily : ""
-            }
+            layer.enabled: true
+            layer.effect: ColorOverlay {
+              color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
 
-            Behavior on color {
+              Behavior on color {
                 ColorAnimation {
-                    duration: 400
+                  duration: 400
                 }
 
+              }
             }
 
         }
