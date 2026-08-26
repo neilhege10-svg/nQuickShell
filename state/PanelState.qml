@@ -1,19 +1,38 @@
-import QtQuick
 pragma Singleton
+import QtQuick
 
+// ── PanelState ────────────────────────────────────────────────────────
+// State for the shapeshifting control panel. currentPage drives which
+// content the panel's Loader shows.
+//
+// barWidth is published by Bar.qml (its dockContainer's actual width),
+// so other windows (like ShellPanel) can size themselves to match the
+// bar without needing direct access to it — they're separate windows,
+// so this shared singleton is the only way to pass that value across.
+// ─────────────────────────────────────────────────────────────────────
 QtObject {
-    property bool rPanelOpen: false
-    property bool lPanelOpen: false
-    property bool cPanelOpen: false
-    property bool settingPanelOpen: false
+    id: root
 
-    property string activePage: "session"
-    property string rPanelPage: "audio"
+    property bool panelOpen: false
+    property string currentPage: "wallpaper"
+    property real barWidth: 300 // sane fallback until Bar.qml reports its real width
+    property bool cPanelOpen: false // used by the power/session button in Bar.qml
 
-    property string pendingAction: ""
-    property string pendingCmd: ""
+    function open(page) {
+        if (page !== undefined)
+            currentPage = page;
+        panelOpen = true;
+    }
 
-    // WiFi password prompt — stores the network object clicked in NetworkSection
-    // WifiPasswordControl reads this to know which network to connect to
-    property var wifiTarget: null
+    function close() {
+        panelOpen = false;
+    }
+
+    function toggle(page) {
+        if (panelOpen && (page === undefined || page === currentPage)) {
+            close();
+        } else {
+            open(page);
+        }
+    }
 }

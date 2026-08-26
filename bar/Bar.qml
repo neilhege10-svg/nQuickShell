@@ -39,6 +39,9 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         height: theme.barHeight - 1
         width: contentLayout.implicitWidth + 500
+
+        onWidthChanged: PanelState.barWidth = width
+        Component.onCompleted: PanelState.barWidth = width
 //--------------------------------------------------------------------------------------
 // MAIN SHAPE OF THE BAR
 //--------------------------------------------------------------------------------------
@@ -235,25 +238,24 @@ RowLayout {
 // theyre anchored to the contentLayout above but are margined to the left and right
 // to live just outside the bar
 //--------------------------------------------------------------------------------------
-        BtnRound {
-            t: theme
-            icon: ""
-            hasBorder: true
-            showShadow: true
-            scale: 0.82
-            activeState: PanelState.settingPanelOpen
-            onClicked: PanelState.settingPanelOpen = !PanelState.settingPanelOpen
+BtnRound {
+    t: theme
+    icon: ""
+    hasBorder: true
+    showShadow: true
+    scale: 0.82
+    activeState: PanelState.panelOpen && PanelState.currentPage === "wallpaper"
+    onClicked: PanelState.toggle("wallpaper")
 
-            anchors {
-                left: contentLayout.right
-                top: contentLayout.top
-                topMargin: 1
-                leftMargin: 17
-            }
+    anchors {
+        left: contentLayout.right
+        top: contentLayout.top
+        topMargin: 1
+        leftMargin: 17
+    }
+  }
 
-        }
-
-        BtnRound {
+  BtnRound {
             t: theme
             icon: "⏻"
             hasBorder: true
