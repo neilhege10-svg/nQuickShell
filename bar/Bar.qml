@@ -178,6 +178,10 @@ PanelWindow {
                 t: theme
             }
 
+            Bluetooth {
+                t: theme
+            }
+
             Volume {
                 t: theme
             }

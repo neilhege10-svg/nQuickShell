@@ -8,10 +8,10 @@ Item {
 
     // ── CORE PROPERTIES ──────────────────────────────────
     property var t
-    property string netIcon: "../svg/wifi-off.svg"
-    property string netName: "..."
+    property string btIcon: "../svg/bluetooth-off.svg"
+    property string btState: "off"
 
-    // Tell the Bar's RowLayout how much space this module needs
+    // Space requirements for RowLayout (matches Network & Volume)
     implicitHeight: t ? t.pillHeight : 32
     implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
 
@@ -50,12 +50,12 @@ Item {
             }
         }
 
-        // ── PROCESS 1: Check Network & Wi-Fi Radio Status ──────
+        // ── PROCESS 1: Check Bluetooth Power & Connection Status ──────
         Process {
-            id: netProc
+            id: btProc
 
-            // Outputs single-line JSON: {"type":"802-3-ethernet|802-11-wireless|none", "wifi":"enabled|disabled"}
-            command: ["bash", "-c", "TYPE=$(nmcli -t -f TYPE,STATE connection show --active 2>/dev/null | grep ':activated' | head -1 | cut -d: -f1); [ -z \"$TYPE\" ] && TYPE=\"none\"; WIFI=$(nmcli radio wifi 2>/dev/null); echo \"{\\\"type\\\":\\\"$TYPE\\\",\\\"wifi\\\":\\\"$WIFI\\\"}\""]
+            // Outputs single-line JSON: {"powered":"yes|no", "connected":"yes|no"}
+            command: ["bash", "-c", "POWERED=$(bluetoothctl show | grep 'Powered:' | awk '{print $2}'); [ -z \"$POWERED\" ] && POWERED=\"no\"; CONNECTED=$(bluetoothctl info 2>/dev/null | grep 'Connected:' | grep -q 'yes' && echo 'yes' || echo 'no'); echo \"{\\\"powered\\\":\\\"$POWERED\\\",\\\"connected\\\":\\\"$CONNECTED\\\"}\""]
             running: true
 
             stdout: SplitParser {
@@ -65,41 +65,34 @@ Item {
 
                     try {
                         var res = JSON.parse(str);
-                        var type = res.type || "none";
-                        var wifiState = res.wifi || "disabled";
+                        var isPowered = res.powered === "yes";
+                        var isConnected = res.connected === "yes";
 
-                        // 1. Ethernet Connected -> Highest Priority
-                        if (type === "802-3-ethernet") {
-                            root.netIcon = "../svg/cable.svg";
-                            root.netName = "LAN";
-                            return;
+                        if (!isPowered) {
+                            root.btIcon = "../svg/bluetooth-off.svg";
+                            root.btState = "off";
+                        } else if (isConnected) {
+                            root.btIcon = "../svg/bluetooth-connected.svg";
+                            root.btState = "connected";
+                        } else {
+                            root.btIcon = "../svg/bluetooth.svg";
+                            root.btState = "on";
                         }
-
-                        // 2. Wi-Fi Connected
-                        if (type === "802-11-wireless") {
-                            root.netIcon = "../svg/wifi.svg";
-                            root.netName = "WiFi";
-                            return;
-                        }
-
-                        // 3. Wi-Fi Radio Powered Off or Disconnected
-                        root.netIcon = "../svg/wifi-off.svg";
-                        root.netName = (wifiState === "disabled") ? "Off" : "Disconnected";
                     } catch (e) {
-                        console.log("Network parsing error:", e);
+                        console.log("Bluetooth parsing error:", e);
                     }
                 }
             }
         }
 
-        // ── PROCESS 2: Toggle Wi-Fi Power ────────────────────
+        // ── PROCESS 2: Toggle Bluetooth Power ─────────────────
         Process {
-            id: wifiToggleProc
+            id: btToggleProc
 
-            command: ["bash", "-c", root.netIcon === "../svg/wifi-off.svg" ? "nmcli radio wifi on" : "nmcli radio wifi off"]
+            command: ["bash", "-c", root.btState === "off" ? "bluetoothctl power on" : "bluetoothctl power off"]
             
-            // Re-run status check once toggle completes
-            onExited: netProc.running = true
+            // Re-check Bluetooth status after toggle action finishes
+            onExited: btProc.running = true
         }
 
         // ── AUTO-REFRESH TIMER ──────────────────────────────
@@ -107,16 +100,15 @@ Item {
             interval: 10000
             repeat: true
             running: true
-            onTriggered: netProc.running = true
+            onTriggered: btProc.running = true
         }
 
         // ── ICON DISPLAY ─────────────────────────────────────
         Image {
-            id: netLabel
+            id: btLabel
 
-            source: root.netIcon
-            
-            // Scaled down to match font size cleanly (change 'fontSize' or subtract if still too big)
+            source: root.btIcon
+
             readonly property int iconDimension: root.t ? root.t.fontSize : 16
             width: iconDimension
             height: iconDimension
@@ -154,19 +146,15 @@ Item {
         }
     }
 
-    // ── CLICK INTERACTION ────────────────────────────────
+    // ── CLICK INTERACTION (TOGGLE POWER) ─────────────────
     MouseArea {
         id: mouseArea
 
         anchors.fill: parent
-        
-        // Pointer cursor for Wi-Fi / Disconnected, Arrow cursor for Ethernet
-        cursorShape: root.netName === "LAN" ? Qt.ArrowCursor : Qt.PointingHandCursor
+        cursorShape: Qt.PointingHandCursor
 
         onClicked: {
-            if (root.netName !== "LAN") {
-                wifiToggleProc.running = true;
-            }
+            btToggleProc.running = true;
         }
     }
 }

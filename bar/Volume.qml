@@ -1,24 +1,35 @@
 import "../state"
 import Qt5Compat.GraphicalEffects
 import QtQuick
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 
 Item {
     id: root
 
-// ── CORE PROPERTIES ──────────────────────────────────
+    // ── CORE PROPERTIES ──────────────────────────────────
     property var t
 
-//-----------------------------------------------------------------------------------
-// Tell the Bar's RowLayout exactly how much space this module needs
-//-----------------------------------------------------------------------------------
-    implicitHeight: t ? t.pillHeight : 32
-    implicitWidth: volLabel.implicitWidth + (t ? t.widgetPadding * 2 : 16)
+    // Icon path generator based on Pipewire default audio sink
+    readonly property string volIcon: {
+        var sink = Pipewire.defaultAudioSink;
+        if (!sink || !sink.audio || sink.audio.muted)
+            return "../svg/volume-x.svg";
 
-//-----------------------------------------------------------------------------------
-// this is the Glow effect, it activates when the module is clicked
-// by using PanelState in the opacity
-//-----------------------------------------------------------------------------------
+        var pct = Math.round(sink.audio.volume * 100);
+        if (pct > 66)
+            return "../svg/volume-2.svg";
+        if (pct > 33)
+            return "../svg/volume-1.svg";
+        
+        return "../svg/volume.svg";
+    }
+
+    // Space requirements for RowLayout
+    implicitHeight: t ? t.pillHeight : 32
+    implicitWidth: (root.t ? root.t.fontSize + 4 : 18) + (4 * 2)
+
+    // ── GLOW / SHADOW EFFECT ─────────────────────────────
     DropShadow {
         anchors.fill: pill
         horizontalOffset: 3
@@ -27,112 +38,95 @@ Item {
         samples: 17
         color: "#000000"
         source: pill
-        opacity: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? 1 : 0
+        opacity: mouseArea.pressed ? 0.6 : 0
 
-        // animation for the shadow on the module
         Behavior on opacity {
             NumberAnimation {
-                duration: 200
+                duration: 150
                 easing.type: Easing.InOutQuad
             }
-
         }
-
     }
 
-//-----------------------------------------------------------------------------------
-// Main shape and design of the Volume module
-//-----------------------------------------------------------------------------------
+    // ── MAIN PILL CONTAINER ──────────────────────────────
     Rectangle {
         id: pill
 
         anchors.fill: parent
-        radius: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (t ? t.widgetRadius : 12) : (t ? t.widgetRadius : 12)
-        color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (t ? t.base.accent : "#b4befe") : ("transparent")
-        scale: mouseArea.pressed ? 0.9 : 1
+        radius: t ? t.widgetRadius : 12
+        color: "transparent"
+        scale: mouseArea.pressed ? 0.88 : 1.0
 
+        Behavior on scale {
+            NumberAnimation {
+                duration: 120
+                easing.type: Easing.OutQuad
+            }
+        }
+
+        // Pipewire sink tracker to keep UI reactivity instant
         PwObjectTracker {
             objects: [Pipewire.defaultAudioSink]
         }
 
-//-----------------------------------------------------------------------------------
-// Main Text design of the Volume module
-//-----------------------------------------------------------------------------------
-        Text {
+        // Process executing mute toggle across ALL EVO8 related sinks simultaneously
+        Process {
+            id: muteToggleProc
+            command: ["bash", "-c", "for s in $(pactl list short sinks | grep -iE 'evo|evo8' | awk '{print $1}'); do pactl set-sink-mute \"$s\" toggle; done"]
+        }
+
+        // ── ICON DISPLAY ─────────────────────────────────────
+        Image {
             id: volLabel
 
+            source: root.volIcon
+
+            readonly property int iconDimension: root.t ? root.t.fontSize : 16
+            width: iconDimension
+            height: iconDimension
+            sourceSize.width: iconDimension
+            sourceSize.height: iconDimension
+
             anchors.centerIn: parent
-            text: {
-                var sink = Pipewire.defaultAudioSink;
-                if (!sink || !sink.audio)
-                    return "󰸈";
 
-                var pct = Math.round(sink.audio.volume * 100);
-                if (sink.audio.muted)
-                    return "󰸈";
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            mipmap: true
 
-                if (pct > 66)
-                    return "󰕾";
+            layer.enabled: true
+            layer.effect: ColorOverlay {
+                color: root.t ? root.t.base.text : "#cdd6f4"
 
-                if (pct > 33)
-                    return "󰖀"
-
-                return "󰕿";
-            }
-            color: PanelState.rPanelOpen && PanelState.rPanelPage === "audio" ? (root.t ? root.t.base.textAccent : "#11111b") : (root.t ? root.t.base.text : "#cdd6f4")
-
-            font {
-                pixelSize: root.t ? root.t.fontSize : 13
-                family: root.t ? root.t.fontFamily : ""
-            }
-
-            // animation for the color of the module's Text color
-            Behavior on color {
-                ColorAnimation {
-                    duration: 400
-                  }
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 300
+                    }
                 }
-
+            }
         }
 
-//-----------------------------------------------------------------------------------
-// The mouseArea section is what makes the module CLICKABLE by using onClicked property
-// it changes the panelstate and other sections of the code can use the panelstate
-// to change the button's visual
-//-----------------------------------------------------------------------------------
-MouseArea {
-    id: mouseArea
-    anchors.fill: parent
-    cursorShape: Qt.PointingHandCursor
-    
-    onClicked: {
-        if (!PanelState.rPanelOpen) {
-            // If the panel is closed, open it and set the page
-            PanelState.rPanelOpen = true;
-            PanelState.rPanelPage = "audio";
-        } else {
-            // If it's already open, just make sure it switches to the audio page
-            PanelState.rPanelPage = "audio";
-        }
-    }
-}
-
-        // animation for the color of the module's Pill
         Behavior on color {
             ColorAnimation {
                 duration: 330
             }
-
         }
 
-        // animation for the color of the module's radius
         Behavior on radius {
             NumberAnimation {
                 duration: 330
             }
-
         }
-
     }
 
+    // ── CLICK INTERACTION ────────────────────────────────
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+
+        onClicked: {
+            muteToggleProc.running = true;
+        }
+    }
 }
