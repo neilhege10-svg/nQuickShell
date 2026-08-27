@@ -93,7 +93,7 @@ QtObject {
 
     property var mpvProc: Process {
         id: mpvProcInner
-        command: root.pendingWallpaper ? ["mpvpaper", "-o", "loop hwdec=auto", "*", root.pendingWallpaper] : []
+        command: root.pendingWallpaper ? ["mpvpaper", "-o", "loop hwdec=auto panscan=1.0", "*", root.pendingWallpaper] : []
 
         onExited: {
             // if a new wallpaper is queued and differs from what just stopped, start it now

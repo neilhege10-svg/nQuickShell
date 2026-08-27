@@ -7,19 +7,9 @@ import Quickshell
 import Quickshell.Wayland
 
 // ── ShellPanel ────────────────────────────────────────────────────────
-// The shapeshifting control panel. Mirrors Bar.qml's own technique:
-//   - own Theme instance (Bar.qml doesn't rely on being handed one either)
-//   - WlrLayershell.* attached properties for windowing, matching Bar.qml
-//     exactly rather than the generic PanelWindow properties
-//   - a Shape/ShapePath background instead of a plain Rectangle, using
-//     the same PathQuad-corner technique as the bar's dockBg
-//
-// IMPORTANT: the window itself is a FIXED size (openWidth x openHeight).
-// The open/close morph animates an INNER Item (panelBody) that's clipped,
-// not the actual Wayland surface — resizing a real layer-shell surface
-// every animation frame is a heavier, potentially janky operation
-// (configure/ack round-trip each time). Animating a clipped child inside
-// a stable window is the safer bet for smooth motion.
+// The shapeshifting control panel window.
+// Hosts active sub-pages (via Loader) anchored to the top and a floating 
+// NavPill component anchored to the bottom.
 // ─────────────────────────────────────────────────────────────────────
 PanelWindow {
     id: root
@@ -28,7 +18,7 @@ PanelWindow {
 
     readonly property int openWidth: PanelState.barWidth
     readonly property int openHeight: 480
-    readonly property int topRadius: 14
+    readonly property int topRadius: 34
     readonly property int bottomRadius: 34
 
     WlrLayershell.screen: targetScreen
@@ -37,12 +27,24 @@ PanelWindow {
     WlrLayershell.exclusiveZone: 0
     color: "transparent"
 
-    WlrLayershell.anchors {
-        top: true
+    // Unmaps window when collapsed to prevent intercepting mouse clicks
+    property real openAmount: PanelState.panelOpen ? 1 : 0
+    visible: PanelState.panelOpen || openAmount > 0.001
+
+    Behavior on openAmount {
+        NumberAnimation {
+            duration: 420
+        }
     }
 
-    // fixed surface size — big enough for the fully open panel plus
-    // breathing room for the drop shadow / margin gap under the bar
+    WlrLayershell.anchors {
+        top: true
+        left: true
+    }
+
+    // Explicit horizontal centering alignment relative to output
+    margins.left: targetScreen ? Math.round(targetScreen.width / 2 - implicitWidth / 2) : 0
+
     implicitWidth: openWidth + 24
     implicitHeight: openHeight + (theme ? theme.pillHeight : 40) + 24
 
@@ -51,15 +53,14 @@ PanelWindow {
     }
 
 //-----------------------------------------------------------------------------------
-// panelBody — the part that actually animates. Anchored top-right within
-// the fixed window, dropping down from just under the bar.
+// panelBody — Top-anchored morphing panel surface container
 //-----------------------------------------------------------------------------------
     Item {
         id: panelBody
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: theme ? theme.pillHeight + 8 : 40
+        anchors.topMargin: theme ? theme.pillHeight - 4 : 32
 
         implicitWidth: PanelState.panelOpen ? root.openWidth : 1
         implicitHeight: PanelState.panelOpen ? root.openHeight : 1
@@ -67,7 +68,7 @@ PanelWindow {
 
         Behavior on implicitWidth {
             NumberAnimation {
-                duration: 380
+                duration: 100
                 easing.type: Easing.OutBack
                 easing.overshoot: 0.6
             }
@@ -75,15 +76,13 @@ PanelWindow {
 
         Behavior on implicitHeight {
             NumberAnimation {
-                duration: 420
+                duration: 1000
                 easing.type: Easing.OutExpo
             }
         }
 
 //-----------------------------------------------------------------------------------
-// MAIN SHAPE OF THE PANEL — same PathQuad-corner technique as dockBg in
-// Bar.qml. Small radius up top (near the gear button it drops from),
-// bigger radius on the bottom corners for that flowing/dropping feel.
+// Background Path Shape
 //-----------------------------------------------------------------------------------
         Shape {
             id: panelBg
@@ -158,31 +157,51 @@ PanelWindow {
         }
 
 //-----------------------------------------------------------------------------------
-// Page content — swaps based on PanelState.currentPage.
-// Only "wallpaper" exists so far; add more cases as pages get built.
+// Content Layout Structure (Top-Aligned Loader + Bottom NavPill)
 //-----------------------------------------------------------------------------------
-        Loader {
+// Inside ShellPanel.qml -> Content Layout Structure
+
+        Item {
             anchors.fill: parent
             anchors.margins: 16
-            active: PanelState.panelOpen
-            sourceComponent: {
-                switch (PanelState.currentPage) {
-                case "wallpaper":
-                    return wallpaperPlaceholder;
-                default:
-                    return wallpaperPlaceholder;
+
+            // Page Content Grid Container
+            Loader {
+                id: pageLoader
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: navPill.top
+                anchors.bottomMargin: 10
+
+                active: PanelState.panelOpen
+                sourceComponent: {
+                    switch (PanelState.currentPage) {
+                    case "wallpaper":
+                        return wallpaperPage;
+                    default:
+                        return wallpaperPage;
+                    }
                 }
             }
+
+            // Dedicated Navigation Pill — Stretches horizontally to match parent width
+            NavPill {
+                id: navPill
+
+                t: theme
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+            }
         }
-    }
-
+      }
     Component {
-        id: wallpaperPlaceholder
+        id: wallpaperPage
 
-        Text {
-            anchors.centerIn: parent
-            text: "Wallpaper grid goes here"
-            color: theme.base.text
+        WallpaperGrid {
+            t: theme
         }
     }
 }

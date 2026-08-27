@@ -1,1 +1,4 @@
 ShellPanel 1.0 ShellPanel.qml
+WallpaperGrid 1.0 WallpaperGrid.qml
+NavPill 1.0 NavPill.qml
+ShellPanelAnimation 1.0 ShellPanelAnimation.qml

@@ -32,16 +32,29 @@ PanelWindow {
         id: theme
     }
 
+    // Full visual span of the bar. dockContainer already includes generous
+    // built-in padding (+500), and the side buttons land INSIDE its edge
+    // (not past it), so dockContainer.width alone is the correct match.
+    // The dock's right-side ShapePath tapers inward via a chain of PathQuad
+    // curves (see dockBg's ShapePath below) — there's no clean analytical
+    // way to derive the exact rendered edge from those bezier curves, so
+    // this is an eyeballed, tuned-by-hand offset. Kept HERE (next to the
+    // shape that causes it) rather than buried in another file, so future
+    // edits to the taper curves have an obvious place to also update this.
+    readonly property int edgeTaper: 85
+
+    property real barFootprintWidth: dockContainer.width - edgeTaper
+
+    onBarFootprintWidthChanged: PanelState.barWidth = barFootprintWidth
+    Component.onCompleted: PanelState.barWidth = barFootprintWidth
+
     // this determines the height and width of the bar
     Item {
         id: dockContainer
 
         anchors.horizontalCenter: parent.horizontalCenter
         height: theme.barHeight - 1
-        width: contentLayout.implicitWidth + 500
-
-        onWidthChanged: PanelState.barWidth = width
-        Component.onCompleted: PanelState.barWidth = width
+        width: contentLayout.implicitWidth + 700
 //--------------------------------------------------------------------------------------
 // MAIN SHAPE OF THE BAR
 //--------------------------------------------------------------------------------------
@@ -239,6 +252,7 @@ RowLayout {
 // to live just outside the bar
 //--------------------------------------------------------------------------------------
 BtnRound {
+    id: wallpaperBtn
     t: theme
     icon: ""
     hasBorder: true
@@ -256,6 +270,7 @@ BtnRound {
   }
 
   BtnRound {
+            id: powerBtn
             t: theme
             icon: "⏻"
             hasBorder: true
