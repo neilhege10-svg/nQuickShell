@@ -1,25 +1,20 @@
 import "../state"
 import "../theme"
-import Qt5Compat.GraphicalEffects
 import QtQuick
-import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 
 // ── ShellPanel ────────────────────────────────────────────────────────
-// The shapeshifting control panel window.
-// Hosts active sub-pages (via Loader) anchored to the top and a floating 
-// NavPill component anchored to the bottom.
+// Owns the window/click-through plumbing only. The actual shape and its
+// open/close animation sequence live in PanelShape.qml — this file just
+// hosts it and fades page content in once PanelShape signals it's ready.
 // ─────────────────────────────────────────────────────────────────────
 PanelWindow {
     id: root
 
     property var targetScreen
 
-    readonly property int openWidth: PanelState.barWidth
-    readonly property int openHeight: 480
-    readonly property int topRadius: 34
-    readonly property int bottomRadius: 34
+    readonly property var pageSize: PanelState.targetSize()
 
     WlrLayershell.screen: targetScreen
     WlrLayershell.layer: WlrLayer.Overlay
@@ -27,176 +22,88 @@ PanelWindow {
     WlrLayershell.exclusiveZone: 0
     color: "transparent"
 
-    // Unmaps window when collapsed to prevent intercepting mouse clicks
-    property real openAmount: PanelState.panelOpen ? 1 : 0
-    visible: PanelState.panelOpen || openAmount > 0.001
-
-    Behavior on openAmount {
-        NumberAnimation {
-            duration: 420
-        }
-    }
+    // Stays mapped through the full close sequence (not just while
+    // panelOpen is true) so the window only unmaps once PanelShape has
+    // actually finished shrinking — same fix as before, still needed.
+    visible: PanelState.panelOpen || panelShape.animating
 
     WlrLayershell.anchors {
         top: true
         left: true
     }
 
-    // Explicit horizontal centering alignment relative to output
     margins.left: targetScreen ? Math.round(targetScreen.width / 2 - implicitWidth / 2) : 0
 
-    implicitWidth: openWidth + 24
-    implicitHeight: openHeight + (theme ? theme.pillHeight : 40) + 24
+    implicitWidth: pageSize.width + 20
+    implicitHeight: pageSize.height + (theme ? theme.pillHeight : 40) + 20
 
     Theme {
         id: theme
     }
 
 //-----------------------------------------------------------------------------------
-// panelBody — Top-anchored morphing panel surface container
+// The shape + its custom open/close sequence
 //-----------------------------------------------------------------------------------
-    Item {
-        id: panelBody
+    PanelShape {
+        id: panelShape
+
+        t: theme
+        open: PanelState.panelOpen
+        targetWidth: root.pageSize.width
+        targetHeight: root.pageSize.height
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: theme ? theme.pillHeight - 4 : 32
+        anchors.topMargin: 7
+    }
 
-        implicitWidth: PanelState.panelOpen ? root.openWidth : 1
-        implicitHeight: PanelState.panelOpen ? root.openHeight : 1
-        clip: true
+//-----------------------------------------------------------------------------------
+// Content — fades in only once PanelShape.readyForContent flips true,
+// so nothing appears mid-resize. Fades out immediately when closing
+// starts (readyForContent flips false right away), overlapping with the
+// shape's own collapse rather than sitting still first.
+//-----------------------------------------------------------------------------------
+    Item {
+        anchors.fill: panelShape
+        anchors.margins: 16
+        opacity: panelShape.readyForContent ? 1 : 0
 
-        Behavior on implicitWidth {
+        Behavior on opacity {
             NumberAnimation {
-                duration: 100
-                easing.type: Easing.OutBack
-                easing.overshoot: 0.6
+                duration: 200
             }
         }
 
-        Behavior on implicitHeight {
-            NumberAnimation {
-                duration: 1000
-                easing.type: Easing.OutExpo
+        Loader {
+            id: pageLoader
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: navPill.top
+            anchors.bottomMargin: 10
+
+            active: panelShape.readyForContent
+            sourceComponent: {
+                switch (PanelState.currentPage) {
+                case "wallpaper":
+                    return wallpaperPage;
+                default:
+                    return wallpaperPage;
+                }
             }
         }
 
-//-----------------------------------------------------------------------------------
-// Background Path Shape
-//-----------------------------------------------------------------------------------
-        Shape {
-            id: panelBg
+        NavPill {
+            id: navPill
 
-            anchors.fill: parent
-            layer.enabled: true
-            layer.samples: 8
-
-            ShapePath {
-                fillColor: theme.base.bg
-                strokeWidth: 0
-
-                startX: 0
-                startY: root.topRadius
-
-                PathQuad {
-                    controlX: 0
-                    controlY: 0
-                    x: root.topRadius
-                    y: 0
-                }
-
-                PathLine {
-                    x: panelBg.width - root.topRadius
-                    y: 0
-                }
-
-                PathQuad {
-                    controlX: panelBg.width
-                    controlY: 0
-                    x: panelBg.width
-                    y: root.topRadius
-                }
-
-                PathLine {
-                    x: panelBg.width
-                    y: panelBg.height - root.bottomRadius
-                }
-
-                PathQuad {
-                    controlX: panelBg.width
-                    controlY: panelBg.height
-                    x: panelBg.width - root.bottomRadius
-                    y: panelBg.height
-                }
-
-                PathLine {
-                    x: root.bottomRadius
-                    y: panelBg.height
-                }
-
-                PathQuad {
-                    controlX: 0
-                    controlY: panelBg.height
-                    x: 0
-                    y: panelBg.height - root.bottomRadius
-                }
-
-                PathLine {
-                    x: 0
-                    y: root.topRadius
-                }
-            }
-
-            layer.effect: DropShadow {
-                horizontalOffset: 0
-                verticalOffset: 4
-                radius: 12
-                samples: 17
-                color: theme.base.shadow
-            }
+            t: theme
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
         }
+    }
 
-//-----------------------------------------------------------------------------------
-// Content Layout Structure (Top-Aligned Loader + Bottom NavPill)
-//-----------------------------------------------------------------------------------
-// Inside ShellPanel.qml -> Content Layout Structure
-
-        Item {
-            anchors.fill: parent
-            anchors.margins: 16
-
-            // Page Content Grid Container
-            Loader {
-                id: pageLoader
-
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: navPill.top
-                anchors.bottomMargin: 10
-
-                active: PanelState.panelOpen
-                sourceComponent: {
-                    switch (PanelState.currentPage) {
-                    case "wallpaper":
-                        return wallpaperPage;
-                    default:
-                        return wallpaperPage;
-                    }
-                }
-            }
-
-            // Dedicated Navigation Pill — Stretches horizontally to match parent width
-            NavPill {
-                id: navPill
-
-                t: theme
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-            }
-        }
-      }
     Component {
         id: wallpaperPage
 

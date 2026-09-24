@@ -18,8 +18,6 @@ Rectangle {
     radius: root.t ? root.t.widgetRadius : 8
     clip: true
 
-    Component.onCompleted: WallpaperService.rescan()
-
 //-----------------------------------------------------------------------------------
 // Empty state — shown while nothing's been found yet
 //-----------------------------------------------------------------------------------

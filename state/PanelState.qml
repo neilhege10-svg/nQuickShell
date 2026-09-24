@@ -2,21 +2,39 @@ pragma Singleton
 import QtQuick
 
 // ── PanelState ────────────────────────────────────────────────────────
-// State for the shapeshifting control panel. currentPage drives which
-// content the panel's Loader shows.
-//
-// barWidth is published by Bar.qml (its dockContainer's actual width),
-// so other windows (like ShellPanel) can size themselves to match the
-// bar without needing direct access to it — they're separate windows,
-// so this shared singleton is the only way to pass that value across.
+// State for the shapeshifting control panel. currentPage drives both
+// which content the panel's Loader shows AND (via pageSizes below) what
+// target size PanelShape animates to — so adding a new page later is
+// just adding one entry here, not touching the animation code at all.
 // ─────────────────────────────────────────────────────────────────────
 QtObject {
     id: root
 
     property bool panelOpen: false
     property string currentPage: "wallpaper"
-    property real barWidth: 300 // sane fallback until Bar.qml reports its real width
     property bool cPanelOpen: false // used by the power/session button in Bar.qml
+
+    // Each page declares its own target size. Add an entry here when a
+    // new page (theme changer, control center, etc.) gets built —
+    // PanelShape and ShellPanel read from this, nothing else needs to
+    // change.
+    readonly property var pageSizes: ({
+        "wallpaper": {
+            width: 745,
+            height: 481
+        }
+        // "theme": { width: 480, height: 420 },
+        // "control": { width: 760, height: 520 },
+    })
+
+    readonly property var defaultSize: ({
+        width: 480,
+        height: 420
+    })
+
+    function targetSize() {
+        return pageSizes[currentPage] || defaultSize;
+    }
 
     function open(page) {
         if (page !== undefined)

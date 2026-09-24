@@ -82,10 +82,7 @@ QtObject {
     }
 
 //-----------------------------------------------------------------------------------
-// mpvpaper process management. Applying a new wallpaper stops the running
-// instance first (if any), waits for it to actually exit, then relaunches
-// with the new path. Also kills swww/AWWW since they conflict over the
-// wlr-layer-shell background layer.
+// Pure mpvpaper process management (handles all videos and static images)
 //-----------------------------------------------------------------------------------
     property var killConflictProc: Process {
         command: ["pkill", "-x", "awww-daemon"]
@@ -96,7 +93,6 @@ QtObject {
         command: root.pendingWallpaper ? ["mpvpaper", "-o", "loop hwdec=auto panscan=1.0", "*", root.pendingWallpaper] : []
 
         onExited: {
-            // if a new wallpaper is queued and differs from what just stopped, start it now
             if (root.pendingWallpaper && root.pendingWallpaper !== root.currentWallpaper) {
                 root.currentWallpaper = root.pendingWallpaper;
                 root._persist();
@@ -116,9 +112,7 @@ QtObject {
             _persist();
             mpvProc.running = true;
         }
-    }
-
-//-----------------------------------------------------------------------------------
+    }//-----------------------------------------------------------------------------------
 // Persistence — remember the active wallpaper across quickshell restarts
 //-----------------------------------------------------------------------------------
     property var persistProc: Process {

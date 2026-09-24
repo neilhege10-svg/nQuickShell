@@ -4,8 +4,11 @@ import "menu/RMenu"
 import "menu/SessionMenu"
 import "menu/SettingMenu"
 import "menu"
+import "services"
 
 ShellRoot {
+// Inside your main shell.qml / root element
+property var initWallpaper: WallpaperService
     Variants {
         model: Quickshell.screens
 
@@ -28,16 +31,6 @@ ShellRoot {
 
     }
     
-    Variants {
-        model: Quickshell.screens
-
-        delegate: RightPanel {
-            required property var modelData
-
-            targetScreen: modelData
-        }
-
-      }
 
     Variants {
         model: Quickshell.screens
