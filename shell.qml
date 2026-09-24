@@ -7,8 +7,10 @@ import "menu"
 import "services"
 
 ShellRoot {
-// Inside your main shell.qml / root element
+
+// Launches wallpaper on launch
 property var initWallpaper: WallpaperService
+
     Variants {
         model: Quickshell.screens
 
