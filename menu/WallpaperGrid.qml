@@ -23,7 +23,7 @@ Rectangle {
 //-----------------------------------------------------------------------------------
     Text {
         anchors.centerIn: parent
-        visible: WallpaperService.wallpapers.length === 0
+        visible: WallpaperService.filteredWallpapers.length === 0
         text: "No wallpapers found in " + WallpaperService.wallpaperDir
         color: root.t ? root.t.base.text : "#cdd6f4"
         opacity: 0.6
@@ -40,7 +40,7 @@ Rectangle {
 
         anchors.fill: parent
         anchors.margins: 8 // Clean inset padding around the whole grid
-        visible: WallpaperService.wallpapers.length > 0
+        visible: WallpaperService.filteredWallpapers.length > 0
         clip: true
 
         flow: GridView.FlowTopToBottom
@@ -49,7 +49,7 @@ Rectangle {
         cellWidth: width / 4
         cellHeight: cellWidth * (9 / 16)
 
-        model: WallpaperService.wallpapers
+        model: WallpaperService.filteredWallpapers
 
         WheelHandler {
             onWheel: event => {

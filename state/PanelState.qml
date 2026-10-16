@@ -21,15 +21,16 @@ QtObject {
     readonly property var pageSizes: ({
         "wallpaper": {
             width: 745,
-            height: 481
+            height: 495
+        },
+        "main": {
+          width: 1000,
+            height: 495
         }
-        // "theme": { width: 480, height: 420 },
-        // "control": { width: 760, height: 520 },
     })
-
     readonly property var defaultSize: ({
-        width: 480,
-        height: 420
+        width: 745,
+        height: 495
     })
 
     function targetSize() {

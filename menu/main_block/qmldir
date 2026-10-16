@@ -1,0 +1,4 @@
+AudioBlock 1.0 AudioBlock.qml
+SessionBlock 1.0 SessionBlock.qml
+StatsBlock 1.0 StatsBlock.qml
+TogglesBlock 1.0 TogglesBlock.qml

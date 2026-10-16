@@ -23,10 +23,12 @@ RowLayout {
         "4": "4",
         "5": "5",
         "6": "6",
-        "7": "󰨜",
-        "8": "󰺷 ",
-        "9": "󰉏",
-        "10": "󰺷 "
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "󰺷 ",
+        "12": "󰺷 "
     })
 
     spacing: 0
@@ -92,7 +94,7 @@ RowLayout {
 
                     anchors.centerIn: parent
                     text: root.workspaceIcons[modelData.id] || modelData.id
-                    color: root.t ? root.t.base.textAccent : "#11111b"
+                    color: root.t ? root.t.base.surface : "#11111b"
 
                     font {
                         pixelSize: 15

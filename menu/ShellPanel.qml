@@ -19,6 +19,7 @@ PanelWindow {
     WlrLayershell.screen: targetScreen
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "shell-panel"
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
     WlrLayershell.exclusiveZone: 0
     color: "transparent"
 
@@ -86,10 +87,12 @@ PanelWindow {
             active: panelShape.readyForContent
             sourceComponent: {
                 switch (PanelState.currentPage) {
+                case "main":
+                    return mainPage;
                 case "wallpaper":
                     return wallpaperPage;
                 default:
-                    return wallpaperPage;
+                    return mainPage;
                 }
             }
         }
@@ -101,6 +104,14 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+        }
+    }
+
+    Component {
+        id: mainPage
+
+        MainPage {
+            t: theme
         }
     }
 

@@ -27,10 +27,32 @@ QtObject {
     property string pendingWallpaper: ""   // used to sequence stop -> restart
     property var wallpapers: []            // [{ path, name, thumb, isVideo }, ...]
 
+    property string searchQuery: ""
+        property var filteredWallpapers: []
+
+        onSearchQueryChanged: applyFilter()
+        onWallpapersChanged: applyFilter()
+
+        function applyFilter() {
+        if (root.searchQuery.trim() === "") {
+            // Use slice() to force QML to recognize the array change
+            root.filteredWallpapers = root.wallpapers.slice();
+            return;
+        }
+
+        var query = root.searchQuery.toLowerCase();
+        var temp = [];
+        for (var i = 0; i < root.wallpapers.length; i++) {
+            if (root.wallpapers[i].name.toLowerCase().indexOf(query) !== -1) {
+                temp.push(root.wallpapers[i]);
+            }
+        }
+        root.filteredWallpapers = temp;
+    }
 //-----------------------------------------------------------------------------------
-// Scan + thumbnail generation. One combined script so we're not spawning a
-// Process per file — it loops internally and prints one line per wallpaper
-// so QML only has to parse the output once.
+// scan + thumbnail generation. one combined script so we're not spawning a
+// process per file — it loops internally and prints one line per wallpaper
+// so qml only has to parse the output once.
 //-----------------------------------------------------------------------------------
     readonly property string _scanScript:
         "mkdir -p '" + thumbDir + "'\n" +
@@ -140,4 +162,5 @@ QtObject {
         rescan();
         restoreProc.running = true;
     }
+
 }

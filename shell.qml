@@ -21,18 +21,7 @@ property var initWallpaper: WallpaperService
         }
 
     }
-
-    Variants {
-        model: Quickshell.screens
-
-        delegate: SettingPanel {
-            required property var modelData
-
-            targetScreen: modelData
-        }
-
-    }
-    
+   
 
     Variants {
         model: Quickshell.screens
