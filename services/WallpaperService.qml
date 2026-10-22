@@ -2,165 +2,157 @@ pragma Singleton
 import QtQuick
 import Quickshell.Io
 
-// ── WallpaperService ─────────────────────────────────────────────────
-// Owns everything backend-related for the wallpaper switcher:
-//   - scans ~/wallpapers for media files
-//   - generates + caches video thumbnails via ffmpeg (skips regen if
-//     the thumbnail is already newer than its source file)
-//   - manages the mpvpaper process (start/stop/switch)
-//   - persists + restores the last-applied wallpaper across restarts
-//
-// UI (WallpaperGrid.qml) just binds to `wallpapers` and calls
-// applyWallpaper(path). Everything else is internal.
-//
-// NOTE: paths below are hardcoded to /home/neil — adjust if you ever
-// move this config to another machine/user.
-// ────────────────────────────────────────────────────────────────────
+// WallpaperService
+// Scans ~/Pictures/Wallpapers, generates video thumbnails, chooses the
+// correct wallpaper backend, and remembers the last successful selection.
 QtObject {
     id: root
 
     readonly property string wallpaperDir: "/home/neil/Pictures/Wallpapers"
     readonly property string thumbDir: "/home/neil/.cache/quickshell/wallpaper-thumbs"
     readonly property string stateFile: "/home/neil/.local/state/quickshell/current-wallpaper.txt"
+    readonly property string applyScript: "/home/neil/.config/quickshell-custom/services/WallpaperApply.sh"
 
-    property string currentWallpaper: ""   // full path of the applied wallpaper
-    property string pendingWallpaper: ""   // used to sequence stop -> restart
-    property var wallpapers: []            // [{ path, name, thumb, isVideo }, ...]
-
+    property string currentWallpaper: ""
+    property string pendingWallpaper: ""
+    property string processingWallpaper: ""
+    property var wallpapers: []
     property string searchQuery: ""
-        property var filteredWallpapers: []
+    property var filteredWallpapers: []
 
-        onSearchQueryChanged: applyFilter()
-        onWallpapersChanged: applyFilter()
+    onSearchQueryChanged: applyFilter()
+    onWallpapersChanged: applyFilter()
 
-        function applyFilter() {
-        if (root.searchQuery.trim() === "") {
-            // Use slice() to force QML to recognize the array change
-            root.filteredWallpapers = root.wallpapers.slice();
-            return;
+    function applyFilter() {
+        if (searchQuery.trim() === "") {
+            filteredWallpapers = wallpapers.slice()
+            return
         }
 
-        var query = root.searchQuery.toLowerCase();
-        var temp = [];
-        for (var i = 0; i < root.wallpapers.length; i++) {
-            if (root.wallpapers[i].name.toLowerCase().indexOf(query) !== -1) {
-                temp.push(root.wallpapers[i]);
-            }
+        var query = searchQuery.toLowerCase()
+        var result = []
+        for (var i = 0; i < wallpapers.length; i++) {
+            if (wallpapers[i].name.toLowerCase().indexOf(query) !== -1)
+                result.push(wallpapers[i])
         }
-        root.filteredWallpapers = temp;
+        filteredWallpapers = result
     }
-//-----------------------------------------------------------------------------------
-// scan + thumbnail generation. one combined script so we're not spawning a
-// process per file — it loops internally and prints one line per wallpaper
-// so qml only has to parse the output once.
-//-----------------------------------------------------------------------------------
+
+    // One shell process scans the directory and generates missing/outdated
+    // thumbnails. Paths are passed as positional arguments, not shell code.
     readonly property string _scanScript:
-        "mkdir -p '" + thumbDir + "'\n" +
-        "for f in '" + wallpaperDir + "'/*; do\n" +
+        "mkdir -p \"$THUMB_DIR\"\n" +
+        "for f in \"$WALLPAPER_DIR\"/*; do\n" +
         "  [ -f \"$f\" ] || continue\n" +
         "  base=$(basename \"$f\")\n" +
         "  ext=\"${base##*.}\"\n" +
         "  name=\"${base%.*}\"\n" +
         "  case \"${ext,,}\" in\n" +
         "    mp4|webm|mkv|mov)\n" +
-        "      thumb=\"" + thumbDir + "/$name.jpg\"\n" +
+        "      thumb=\"$THUMB_DIR/$name.jpg\"\n" +
         "      if [ ! -f \"$thumb\" ] || [ \"$f\" -nt \"$thumb\" ]; then\n" +
         "        ffmpeg -y -ss 00:00:01 -i \"$f\" -vframes 1 -vf scale=320:-1 \"$thumb\" >/dev/null 2>&1\n" +
         "      fi\n" +
-        "      echo \"VIDEO|$f|$thumb\"\n" +
+        "      printf 'VIDEO|%s|%s\\n' \"$f\" \"$thumb\"\n" +
         "      ;;\n" +
-        "    png|jpg|jpeg|gif)\n" +
-        "      echo \"IMAGE|$f|$f\"\n" +
+        "    png|jpg|jpeg|webp|bmp|gif)\n" +
+        "      printf 'IMAGE|%s|%s\\n' \"$f\" \"$f\"\n" +
         "      ;;\n" +
         "  esac\n" +
         "done\n"
 
     property var scanProc: Process {
-        command: ["bash", "-c", root._scanScript]
+        command: ["bash", "-c",
+            "WALLPAPER_DIR=\"$1\" THUMB_DIR=\"$2\"; export WALLPAPER_DIR THUMB_DIR; " + root._scanScript,
+            "wallpaper-scan", root.wallpaperDir, root.thumbDir]
 
         stdout: SplitParser {
             onRead: (line) => {
-                var parts = line.split("|");
+                var parts = line.split("|")
                 if (parts.length < 3)
-                    return;
-                var list = root.wallpapers.slice();
-                var fullPath = parts[1];
-                var base = fullPath.substring(fullPath.lastIndexOf("/") + 1);
-                var name = base.substring(0, base.lastIndexOf("."));
+                    return
+
+                var fullPath = parts[1]
+                var base = fullPath.substring(fullPath.lastIndexOf("/") + 1)
+                var dot = base.lastIndexOf(".")
+                var name = dot > 0 ? base.substring(0, dot) : base
+                var list = root.wallpapers.slice()
                 list.push({
                     path: fullPath,
                     name: name,
                     thumb: parts[2],
                     isVideo: parts[0] === "VIDEO"
-                });
-                root.wallpapers = list;
+                })
+                root.wallpapers = list
             }
         }
     }
 
     function rescan() {
-        wallpapers = [];
-        scanProc.running = true;
+        wallpapers = []
+        scanProc.running = true
     }
 
-//-----------------------------------------------------------------------------------
-// Pure mpvpaper process management (handles all videos and static images)
-//-----------------------------------------------------------------------------------
-    property var killConflictProc: Process {
-        command: ["pkill", "-x", "awww-daemon"]
-    }
+    // Serialize selections: if the user clicks several items quickly, finish
+    // the current switch and then apply the latest requested wallpaper.
+    property var applyProc: Process {
+        command: [root.applyScript, root.processingWallpaper]
 
-    property var mpvProc: Process {
-        id: mpvProcInner
-        command: root.pendingWallpaper ? ["mpvpaper", "-o", "loop hwdec=auto panscan=1.0", "*", root.pendingWallpaper] : []
-
-        onExited: {
-            if (root.pendingWallpaper && root.pendingWallpaper !== root.currentWallpaper) {
-                root.currentWallpaper = root.pendingWallpaper;
-                root._persist();
-                running = true;
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) {
+                root.currentWallpaper = root.processingWallpaper
+                root._persist()
+            } else {
+                console.warn("WallpaperService: failed to apply wallpaper (exit code " + exitCode + "): " + root.processingWallpaper)
             }
+
+            if (root.pendingWallpaper !== root.processingWallpaper)
+                root._startNextApply()
         }
     }
 
     function applyWallpaper(path) {
-        killConflictProc.running = true;
-        pendingWallpaper = path;
+        if (!path || path.length === 0)
+            return
 
-        if (mpvProc.running) {
-            mpvProc.running = false; // onExited will relaunch with the new path
-        } else {
-            currentWallpaper = path;
-            _persist();
-            mpvProc.running = true;
-        }
-    }//-----------------------------------------------------------------------------------
-// Persistence — remember the active wallpaper across quickshell restarts
-//-----------------------------------------------------------------------------------
+        pendingWallpaper = path
+        if (!applyProc.running)
+            _startNextApply()
+    }
+
+    function _startNextApply() {
+        if (!pendingWallpaper || applyProc.running)
+            return
+
+        processingWallpaper = pendingWallpaper
+        applyProc.command = ["bash", applyScript, processingWallpaper]
+        applyProc.running = true
+    }
+
     property var persistProc: Process {
-        command: root.currentWallpaper
-            ? ["bash", "-c", "mkdir -p \"$(dirname '" + root.stateFile + "')\" && echo '" + root.currentWallpaper + "' > '" + root.stateFile + "'"]
-            : []
+        command: ["bash", "-c",
+            "mkdir -p \"$(dirname \"$1\")\" && printf '%s\\n' \"$2\" > \"$1\"",
+            "wallpaper-persist", root.stateFile, root.currentWallpaper]
     }
 
     function _persist() {
-        persistProc.running = true;
+        persistProc.running = true
     }
 
     property var restoreProc: Process {
-        command: ["bash", "-c", "cat '" + root.stateFile + "' 2>/dev/null"]
+        command: ["bash", "-c", "cat \"$1\" 2>/dev/null", "wallpaper-restore", root.stateFile]
 
         stdout: SplitParser {
             onRead: (line) => {
-                if (line.trim().length > 0)
-                    root.applyWallpaper(line.trim());
+                var path = line.trim()
+                if (path.length > 0)
+                    root.applyWallpaper(path)
             }
         }
     }
 
     Component.onCompleted: {
-        rescan();
-        restoreProc.running = true;
+        rescan()
+        restoreProc.running = true
     }
-
 }

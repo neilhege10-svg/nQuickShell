@@ -1,61 +1,315 @@
-// menu/MainPage.qml
+
 import QtQuick
 import QtQuick.Layouts
-import "main_block" 
+import "main_block"
+import "../services"
 
-Item { 
+Item {
     id: root
+
     property var t
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 0
-        spacing: 16 
+        spacing: 12
 
-        // ── TOP ROW (50% of total height) ────────────────────────────
+        // Top half
         RowLayout {
             Layout.fillWidth: true
-            Layout.fillHeight: true 
-            Layout.preferredHeight: 1 // Acts as a 1:1 ratio with the bottom row
-            spacing: 16
+            Layout.fillHeight: true
+            Layout.minimumHeight: 0
+            spacing: 12
 
-            // LEFT COLUMN: Session & Toggles (1/3 of top row width)
             ColumnLayout {
-                Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.preferredWidth: 1 // 1 part width
-                spacing: 16
+                Layout.fillHeight: true
+                Layout.minimumWidth: 0
+                Layout.preferredWidth: 1
+                spacing: 12
 
-                SessionBlock { 
+                SessionBlock {
                     t: root.t
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredHeight: 1 // 50% of the left column
-                }
-                
-                TogglesBlock { 
-                    t: root.t
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true 
-                    Layout.preferredHeight: 1 // 50% of the left column
+                    Layout.minimumHeight: 0
+                    Layout.preferredHeight: 1
                 }
             }
 
-            // RIGHT COLUMN: Audio (2/3 of top row width)
             AudioBlock {
                 t: root.t
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: 2 // 2 parts width (Double the left column)
+                Layout.minimumWidth: 0
+                Layout.minimumHeight: 0
+                Layout.preferredWidth: 2
             }
         }
 
-        // ── BOTTOM ROW (50% of total height) ─────────────────────────
+        // Bottom half
         StatsBlock {
             t: root.t
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredHeight: 1 // Acts as a 1:1 ratio with the top row
+            Layout.minimumHeight: 0
+            Layout.preferredHeight: 1
+        }
+    }
+
+    // Full-page modal overlay
+    Rectangle {
+        id: confirmationOverlay
+
+        property bool overlayShown: false
+
+        anchors.fill: parent
+        z: 100
+        visible: overlayShown
+
+        opacity: SessionService.confirmationVisible ? 1 : 0
+
+        color: root.t
+            ? Qt.rgba(
+                root.t.base.bg.r,
+                root.t.base.bg.g,
+                root.t.base.bg.b,
+                0.62
+            )
+            : "#9e171717"
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        // Keep the overlay alive until the fade-out finishes.
+        onOpacityChanged: {
+            if (opacity === 0 && !SessionService.confirmationVisible)
+                overlayShown = false
+        }
+
+        Connections {
+            target: SessionService
+
+            function onConfirmationVisibleChanged() {
+                if (SessionService.confirmationVisible)
+                    confirmationOverlay.overlayShown = true
+            }
+        }
+
+        Component.onCompleted: {
+            overlayShown = SessionService.confirmationVisible
+        }
+
+        // Consume clicks so the underlying page cannot be used.
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {}
+        }
+
+        // Confirmation dialog
+        Rectangle {
+            id: dialog
+
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 32, 310)
+            height: content.implicitHeight + 32
+
+            radius: root.t ? root.t.widgetRadius : 12
+            color: root.t ? root.t.base.surface : "#1f1f1f"
+            border.width: 1
+            border.color: root.t
+                ? root.t.holo.neon
+                : "#5903cffc"
+
+            opacity: SessionService.confirmationVisible ? 1 : 0
+            scale: SessionService.confirmationVisible ? 1 : 0.96
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 180
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            ColumnLayout {
+                id: content
+
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 10
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: SessionService.pendingAction === "poweroff"
+                        ? "Shut down this computer?"
+                        : "Restart this computer?"
+
+                    color: root.t ? root.t.base.text : "#e6e6e6"
+                    font.family: root.t
+                        ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+                    font.pixelSize: 13
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: SessionService.pendingAction === "poweroff"
+                        ? "Your current session will end."
+                        : "Your current session will close."
+
+                    color: root.t
+                        ? root.t.base.textInactive : "#6e6e6e"
+                    font.family: root.t
+                        ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+                    font.pixelSize: 10
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    // Cancel button
+                    Rectangle {
+                        id: cancelButton
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 32
+
+                        radius: 7
+
+                        color: cancelMouse.containsMouse
+                            ? (root.t
+                                ? root.t.holo.neonActive : "#a603cffc")
+                            : (root.t
+                                ? root.t.holo.holobg : "#1a3e78d6")
+
+                        border.width: 1
+                        border.color: cancelMouse.containsMouse
+                            ? (root.t
+                                ? root.t.holo.neonActive : "#a603cffc")
+                            : (root.t
+                                ? root.t.holo.neon : "#5903cffc")
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 140
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: 140
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            text: "Cancel"
+                            color: root.t
+                                ? root.t.base.text : "#e6e6e6"
+                            font.family: root.t
+                                ? root.t.fontFamily
+                                : "JetBrainsMono Nerd Font"
+                            font.pixelSize: 11
+                        }
+
+                        MouseArea {
+                            id: cancelMouse
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+
+                            onClicked: {
+                                SessionService.cancelConfirmation()
+                            }
+                        }
+                    }
+
+                    // Confirm button
+                    Rectangle {
+                        id: confirmButton
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 32
+
+                        radius: 7
+
+                        color: confirmMouse.containsMouse
+                            ? (root.t
+                                ? root.t.holo.warningActive : "#ffff5555")
+                            : (root.t
+                                ? root.t.holo.warningBgSel : "#4dff5555")
+
+                        border.width: 1
+                        border.color: confirmMouse.containsMouse
+                            ? (root.t
+                                ? root.t.holo.warningText : "#ff7777")
+                            : (root.t
+                                ? root.t.holo.warningText : "#ff5555")
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 140
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: 140
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            text: SessionService.pendingAction === "poweroff"
+                                ? "Shut down" : "Restart"
+
+                            color: root.t
+                                ? root.t.base.text : "#e6e6e6"
+                            font.family: root.t
+                                ? root.t.fontFamily
+                                : "JetBrainsMono Nerd Font"
+                            font.pixelSize: 11
+                            font.bold: true
+                        }
+
+                        MouseArea {
+                            id: confirmMouse
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+
+                            onClicked: {
+                                SessionService.confirmAction()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
