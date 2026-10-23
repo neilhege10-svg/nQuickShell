@@ -16,7 +16,11 @@ Item {
     implicitHeight: t ? t.pillHeight : 32
     implicitWidth: netLabel.width
 
-    // ── MAIN CONTAINER ───────────────────────────────────
+// ── MAIN PILL CONTAINER ──────────────────────────────
+// Rectangle for the module,
+// its set to transparent, because the actual pill lives in Bar.qml and this is crammed
+// alongside other modules, such as Volume,Wifi,etc
+// ─────────────────────────────────────────────────────
     Rectangle {
         id: pill
 
@@ -32,7 +36,10 @@ Item {
             }
         }
 
-        // ── PROCESS 1: Check Network Status ──────────────────
+// ── PROCESS 1: Check WIFI Status ────────────────
+// this is a simple Bash process that checks the status of the WIFI (wether its on/off/Ethernet)
+// and changes the Icon depending on its status
+// ─────────────────────────────────────────────────────
         Process {
             id: netProc
 
@@ -70,7 +77,11 @@ Item {
             }
         }
 
-        // ── PROCESS 2: Toggle Wi-Fi Power ────────────────────
+// ── PROCESS 2: Toggle Wifi Power ─────────────────
+// this is another simple process that allows the toggling of the module's status
+// onExited, ensures that PROCESS 1 runs once, to check the status of the bluetooth
+// and changes the icon
+// ─────────────────────────────────────────────────────
         Process {
             id: wifiToggleProc
 
@@ -78,7 +89,9 @@ Item {
             onExited: netProc.running = true
         }
 
-        // ── AUTO-REFRESH TIMER ──────────────────────────────
+// ── AUTO-REFRESH TIMER ──────────────────────────────
+// it checks periodaclly if theres any changes, by using PROCESS 1
+// ─────────────────────────────────────────────────────
         Timer {
             interval: 10000
             repeat: true
@@ -86,7 +99,9 @@ Item {
             onTriggered: netProc.running = true
         }
 
-        // ── ICON DISPLAY ─────────────────────────────────────
+// ── ICON DISPLAY ─────────────────────────────────────
+// this is just the visual design, coloring of the icon
+// ─────────────────────────────────────────────────────
         Image {
             id: netLabel
 
@@ -124,7 +139,9 @@ Item {
         }
     }
 
-    // ── CLICK INTERACTION ────────────────────────────────
+// ── CLICK INTERACTION ────────────────────────────────
+// Click function, has Animations, and also runs PROCESS 2 on click
+// ─────────────────────────────────────────────────────
     MouseArea {
         id: mouseArea
 

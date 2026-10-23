@@ -12,7 +12,10 @@ Item {
     // ── CORE PROPERTIES ──────────────────────────────────
     property var t
 
-    // Icon path generator based on Pipewire default audio sink
+// ── MAIN PROCESS ──────────────────────────────
+// this is what makes the icon reactive and changes its icon
+// based on its volume/status (muted/or not)
+// ─────────────────────────────────────────────────────
     readonly property string volIcon: {
         var sink = Pipewire.defaultAudioSink;
         if (!sink || !sink.audio || sink.audio.muted)
@@ -32,7 +35,11 @@ Item {
     implicitHeight: t ? t.pillHeight : 32
     implicitWidth: volLabel.width
 
-    // ── MAIN CONTAINER ───────────────────────────────────
+// ── MAIN PILL CONTAINER ──────────────────────────────
+// Rectangle for the module,
+// its set to transparent, because the actual pill lives in Bar.qml and this is crammed
+// alongside other modules, such as Volume,Wifi,etc
+// ─────────────────────────────────────────────────────
     Rectangle {
         id: pill
 
@@ -49,17 +56,23 @@ Item {
         }
 
         // Pipewire sink tracker to keep UI reactivity instant
+        // (part of Main Process)
         PwObjectTracker {
             objects: [Pipewire.defaultAudioSink]
         }
 
-        // Process executing mute toggle
+// ── PROCESS 2: Toggle Wifi Power ─────────────────
+// this is another simple process that allows the toggling of the module's status
+// and changes the icon
+// ─────────────────────────────────────────────────────
         Process {
             id: muteToggleProc
             command: ["bash", "-c", "for s in $(pactl list short sinks | awk '{print $1}'); do pactl set-sink-mute \"$s\" toggle; done"]
         }
 
-        // ── ICON DISPLAY ─────────────────────────────────────
+// ── ICON DISPLAY ─────────────────────────────────────
+// this is just the visual design, coloring of the icon
+// ─────────────────────────────────────────────────────
         Image {
             id: volLabel
 
@@ -96,7 +109,9 @@ Item {
         }
     }
 
-    // ── CLICK INTERACTION ────────────────────────────────
+// ── CLICK INTERACTION ────────────────────────────────
+// Click function, has Animations, and also runs muteToggleProc on click
+// ─────────────────────────────────────────────────────
     MouseArea {
         id: mouseArea
 

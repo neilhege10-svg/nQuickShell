@@ -1,15 +1,16 @@
-
 import QtQuick
+import Qt5Compat.GraphicalEffects
 
 Rectangle {
     id: root
 
     property var t
-    property string iconText: ""
+// These 2 properties are what allows the Icon and Label to be customizeable
+    property string iconSource: ""
     property string label: ""
 
     signal clicked()
-
+// Color properties of each component in the ActionTile
     readonly property color tileColor:
         t ? t.holo.holobg : "#1a3e78d6"
     readonly property color tileHover:
@@ -24,7 +25,7 @@ Rectangle {
         t ? t.fontFamily : "JetBrainsMono Nerd Font"
 
     radius: 9
-
+// Behaviour for when the mouse hovers over the button
     color: mouseArea.containsMouse ? tileHover : tileColor
 
     border.color: mouseArea.containsMouse
@@ -37,23 +38,36 @@ Rectangle {
             duration: 140
         }
     }
-
+// Column for text and label, this stacks the Icon on top of the Text
     Column {
         anchors.fill: parent
         anchors.margins: 5
         spacing: 2
 
-        Text {
+        Item {
             width: parent.width
             height: Math.max(0, parent.height - labelText.implicitHeight - 2)
 
-            text: root.iconText
-            color: root.iconColor
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: 23
+            Image {
+                id: iconImage
 
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+                anchors.centerIn: parent
+
+                width: 24
+                height: 24
+                source: root.iconSource
+                sourceSize.width: 24
+                sourceSize.height: 24
+
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+                mipmap: true
+
+                layer.enabled: true
+                layer.effect: ColorOverlay {
+                    color: root.iconColor
+                }
+            }
         }
 
         Text {
@@ -81,4 +95,3 @@ Rectangle {
         onClicked: root.clicked()
     }
 }
-

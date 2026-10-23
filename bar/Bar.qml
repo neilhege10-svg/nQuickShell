@@ -9,6 +9,10 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 
+//-- BAR ---------------------------------
+// this is the bar... idk what else to say....
+//----------------------------------------
+
 PanelWindow {
     id: root
 
@@ -197,7 +201,9 @@ RowLayout {
             }
 
 // ── CONTROL STATUS TRAIL PILL ────────────────────────
-
+// This is the pill on the right side of the bar
+// it house a bunch of typical components... like volume, wifi and Bluetooth
+// and has basic toggle features for all of them (still a WIP, need more advanced features)
             Item {
                 Layout.alignment: Qt.AlignVCenter
                 implicitWidth: controlPill.implicitWidth
@@ -269,25 +275,25 @@ BtnRound {
     }
   }
 
-  BtnRound {
-            id: powerBtn
-            t: theme
-            icon: "⏻"
-            hasBorder: true
-            showShadow: true
-            activeState: PanelState.cPanelOpen
-            onClicked: PanelState.cPanelOpen = !PanelState.cPanelOpen
-            scale: 0.82
+BtnRound {
+    id: powerBtn
+    t: theme
+    icon: "⏻"
+    hasBorder: true
+    showShadow: true
+    activeState: PanelState.panelOpen && PanelState.currentPage === "main"
+    onClicked: PanelState.toggle("main")
+    scale: 0.82
 
-            anchors {
-                right: contentLayout.left
-                top: contentLayout.top
-                topMargin: 1
-                rightMargin: 17
-            }
-
-        }
-
+    anchors {
+        right: contentLayout.left
+        top: contentLayout.top
+        topMargin: 1
+        rightMargin: 17
     }
 
-}
+   }
+
+  }
+
+ }

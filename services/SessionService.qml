@@ -5,6 +5,10 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
+// -- SessionBlock.QML Services ---------------------------- 
+// i hate services.
+// ----------------------------------------------------------
+
 Item {
     id: root
 

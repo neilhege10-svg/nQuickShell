@@ -5,8 +5,8 @@ import QtQuick.Shapes
 // ── PanelShape ───────────────────────────────────────────────────────
 // Experimental animation pass.
 //
-// The idea here is to make the panel feel less like a rectangle being
-// resized and more like a HUD element "deploying":
+// This QML is the SHAPE of the Main UI page,
+// aswell as having its Animations Declared here
 //
 // OPEN
 //   1. Seed fades + pops into existence
@@ -40,6 +40,16 @@ Item {
 
     property bool readyForContent: false
 
+
+    // Emitted when the dedicated page-switch resize has finished.
+    signal pageResizeFinished()
+
+    // Resize the panel for a page change without replaying the
+    // opening or closing sequence.
+    function resizeForPage() {
+        pageResizeSeq.stop()
+        pageResizeSeq.start()
+    }
     clip: true
 
     Component.onCompleted: {
@@ -236,6 +246,31 @@ Item {
         }
     }
 
+
+//-----------------------------------------------------------------------------------
+// PAGE SWITCH — smoother, slightly faster resize sequence
+//-----------------------------------------------------------------------------------
+    ParallelAnimation {
+        id: pageResizeSeq
+
+        NumberAnimation {
+            target: root
+            property: "width"
+            to: root.targetWidth
+            duration: 600
+            easing.type: Easing.InOutCubic
+        }
+
+        NumberAnimation {
+            target: root
+            property: "height"
+            to: root.targetHeight
+            duration: 600
+            easing.type: Easing.InOutCubic
+        }
+
+        onFinished: root.pageResizeFinished()
+    }
 //-----------------------------------------------------------------------------------
 // Background shape
 //-----------------------------------------------------------------------------------

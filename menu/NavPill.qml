@@ -1,29 +1,33 @@
-// NavPill.qml
 import QtQuick
 import QtQuick.Layouts
 import "../state"
 import "../services"
-import "../assets" // Adjust this path if your BtnRound is located elsewhere
+import "../assets"
+
+// ── NAVPILL─────────────────────────────────────
+// this is the NavPill,it sits inside of the ShellPanel/PanelShape, and just under EVERY page
+// it serves as an adaptive Navigation section, that changes depending on the page/pages need
+// ───────────────────────────────────────────────
 
 Rectangle {
     id: root
 
     property var t
 
-
-    // Expanded slightly to give the 30px BtnRound components some breathing room
+// Declared Height and radius, and other properties of the universal buttons
     height: root.t ? root.t.btnHeight + 12 : 42
     radius: root.t ? root.t.widgetRadius : 12
 
     color: root.t ? root.t.base.surface : "#1f1f1f"
     border.width: 0
-
+// main Row layout, sorts out the universal buttons alongside local components 
+// from each page into a Row
     RowLayout {
         anchors.fill: parent
         anchors.margins: 6
         spacing: 12
 
-        // ── 1. UNIVERSAL BUTTONS (Left) ──────────────────────────────
+// Universal Buttons, that serves as a way to switch between Pages, in the ShellPanel
         Row {
             spacing: 6
             Layout.alignment: Qt.AlignVCenter
@@ -43,7 +47,9 @@ Rectangle {
             }
         }
 
-        // ── 2. SEARCH BAR (Middle) ───────────────────────────────────
+// ── WALLPAPER NAV 1 ─────────────────────────────────────
+// DEDICATED SEARCH BAR FOR THE WALLPAPER PAGE
+// ──────────────────────────────────────────────────────
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -83,7 +89,9 @@ Rectangle {
             }
         }
 
-        // ── 3. CONTEXTUAL BUTTONS (Right) ────────────────────────────
+// ── WALLPAPER NAV 2 ─────────────────────────────────────
+// DEDICATED REFRESH BUTTON FOR THE WALLPAPER PAGE
+// ──────────────────────────────────────────────────────
         Row {
             spacing: 6
             Layout.alignment: Qt.AlignVCenter

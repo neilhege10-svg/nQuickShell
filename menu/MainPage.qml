@@ -4,11 +4,21 @@ import QtQuick.Layouts
 import "main_block"
 import "../services"
 
+// -- MAIN PAGE -------------------------------------
+// This qml is the MainPage of the main control panel UI 
+// it seperates each of the Control panels into its own dedicated block
+// and organizes them
+// --------------------------------------------------
+
 Item {
     id: root
 
     property var t
-
+// --------------------------------------------------
+// Main ColumnLayout, that organizes the blocks,
+// it nests a column and rowlayout inside of a column layout,
+// seperating into a top half and a bottom half
+// --------------------------------------------------
     ColumnLayout {
         anchors.fill: parent
         spacing: 12
@@ -20,20 +30,13 @@ Item {
             Layout.minimumHeight: 0
             spacing: 12
 
-            ColumnLayout {
+
+            SessionBlock {
+                t: root.t
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumWidth: 0
-                Layout.preferredWidth: 1
-                spacing: 12
-
-                SessionBlock {
-                    t: root.t
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.minimumHeight: 0
-                    Layout.preferredHeight: 1
-                }
+                Layout.minimumHeight: 0
+                Layout.preferredHeight: 1
             }
 
             AudioBlock {
@@ -56,7 +59,12 @@ Item {
         }
     }
 
-    // Full-page modal overlay
+// --OVERLAY for SessionBlock.qml------------------------------------------------
+// this shit... is a pain in the ass that i dont understand
+// its an overlay specifically for the SessionBlock.qml
+// when you click on the power/restart buttom, it dimns the entire page's bg and summons an overlay
+// a confirmation button, so that we dont accidentally shutdown the entire f'ing PC
+// --------------------------------------------------
     Rectangle {
         id: confirmationOverlay
 

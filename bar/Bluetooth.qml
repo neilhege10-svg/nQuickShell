@@ -6,17 +6,21 @@ import Qt5Compat.GraphicalEffects
 Item {
     id: root
 
-    // ── CORE PROPERTIES ──────────────────────────────────
+// ── CORE PROPERTIES ──────────────────────────────────
     property var t
     property string btIcon: "../svg/bluetooth-off.svg"
     property string btState: "off"
 
-    // ── LAYOUT BOUNDS ────────────────────────────────────
-    // Keeps layout footprint tight to preserve RowLayout spacing
+// ── LAYOUT BOUNDS ────────────────────────────────────
+// Keeps layout footprint tight to preserve RowLayout spacing
     implicitHeight: t ? t.pillHeight : 32
     implicitWidth: btLabel.width
 
-    // ── MAIN PILL CONTAINER ──────────────────────────────
+// ── MAIN PILL CONTAINER ──────────────────────────────
+// Rectangle for the module,
+// its set to transparent, because the actual pill lives in Bar.qml and this is crammed
+// alongside other modules, such as Volume,Wifi,etc
+// ─────────────────────────────────────────────────────
     Rectangle {
         id: pill
 
@@ -32,7 +36,10 @@ Item {
             }
         }
 
-        // ── PROCESS 1: Check Bluetooth Status ────────────────
+// ── PROCESS 1: Check Bluetooth Status ────────────────
+// this is a simple Bash process that checks the status of the bluetooth (wether its on/off)
+// and changes the Icon depending on its status
+// ─────────────────────────────────────────────────────
         Process {
             id: btProc
 
@@ -66,7 +73,11 @@ Item {
             }
         }
 
-        // ── PROCESS 2: Toggle Bluetooth Power ─────────────────
+// ── PROCESS 2: Toggle Bluetooth Power ─────────────────
+// this is another simple process that allows the toggling of the module's status
+// onExited, ensures that PROCESS 1 runs once, to check the status of the bluetooth
+// and changes the icon
+// ─────────────────────────────────────────────────────
         Process {
             id: btToggleProc
 
@@ -74,7 +85,9 @@ Item {
             onExited: btProc.running = true
         }
 
-        // ── AUTO-REFRESH TIMER ──────────────────────────────
+// ── AUTO-REFRESH TIMER ──────────────────────────────
+// it checks periodaclly if theres any changes, by using PROCESS 1
+// ─────────────────────────────────────────────────────
         Timer {
             interval: 10000
             repeat: true
@@ -82,7 +95,9 @@ Item {
             onTriggered: btProc.running = true
         }
 
-        // ── ICON DISPLAY ─────────────────────────────────────
+// ── ICON DISPLAY ─────────────────────────────────────
+// this is just the visual design, coloring of the icon
+// ─────────────────────────────────────────────────────
         Image {
             id: btLabel
 
@@ -119,7 +134,9 @@ Item {
         }
     }
 
-    // ── CLICK INTERACTION ────────────────────────────────
+// ── CLICK INTERACTION ────────────────────────────────
+// Click function, has Animations, and also runs PROCESS 2 on click
+// ─────────────────────────────────────────────────────
     MouseArea {
         id: mouseArea
 
