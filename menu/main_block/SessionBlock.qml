@@ -37,26 +37,34 @@ Rectangle {
         anchors.margins: 12
         spacing: 10
 
-        // organizes the Blue line and the HEADERS
-        RowLayout {
+        // ── HEADER ──────────────────────────────
+        Item {
+            id: sessionHeader
             Layout.fillWidth: true
-            spacing: 8
+            Layout.preferredHeight: 38
 
-            // Blue line at the beginning of the header
+            // Blue accent line
             Rectangle {
-                Layout.preferredWidth: 3
-                Layout.preferredHeight: 22
+                id: headerAccent
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
 
+                width: 3
+                height: 22
                 radius: 2
                 color: root.accent
             }
 
-            // Organizes the Main Header and Sub Header
-            ColumnLayout {
-                Layout.fillWidth: true
+            // Header and subtitle
+            Column {
+                anchors.left: headerAccent.right
+                anchors.leftMargin: 8
+                anchors.right: profilePicture.left
+                anchors.rightMargin: 12
+                anchors.verticalCenter: parent.verticalCenter
+
                 spacing: 1
 
-                // MAIN HEADER TEXT
                 Text {
                     text: "SESSION"
                     color: root.primaryText
@@ -66,20 +74,22 @@ Rectangle {
                     font.letterSpacing: 1.2
                 }
 
-                // SUB HEADER TEXT
                 Text {
                     text: "Power and System actions"
                     color: root.mutedText
                     font.family: root.uiFont
                     font.pixelSize: 10
                 }
-              } 
+            }
 
-            // Profile Picture
+            // Profile picture: explicitly anchored to the far right
             Rectangle {
-                Layout.preferredWidth: 38
-                Layout.preferredHeight: 38
+                id: profilePicture
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
 
+                width: 42
+                height: 42
                 radius: width / 2
                 color: "transparent"
                 border.color: root.accent
@@ -93,22 +103,20 @@ Rectangle {
                     fillMode: Image.PreserveAspectCrop
                     smooth: true
                     mipmap: true
-
                     sourceSize.width: 256
                     sourceSize.height: 256
 
                     layer.enabled: true
                     layer.effect: OpacityMask {
                         maskSource: Rectangle {
-                            width: 38
-                            height: 38
+                            width: 34
+                            height: 34
                             radius: width / 2
                         }
                     }
                 }
-             }
-
-          }
+            }
+        }
 
 // Seperator Line between the Header and the ActionTiles
         Rectangle {

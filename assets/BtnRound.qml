@@ -14,6 +14,8 @@ Item {
     // ─────────────────────────────────────────────────────────────────
     property var t
     property string icon: ""
+    property url imageSource: ""
+    property int visualSize: 18
     property bool activeState: false
     property bool showShadow: false
     property bool hasBorder: false
@@ -66,20 +68,56 @@ Item {
         border.width: root.hasBorder ? 1 : 0
         border.color: root.finalBorderColor
 
-        Text {
-            id: menuBtn
+                  Loader {
+          id: visualLoader
 
-            anchors.centerIn: parent
-            text: root.icon
-            color: root.finalTextColor
+          anchors.centerIn: parent
+          width: root.visualSize
+          height: root.visualSize
 
-            font {
-                pixelSize: 16
-                family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
-            }
+          sourceComponent: root.imageSource.toString() !== ""
+                          ? imageVisual
+                          : iconVisual
+      }
 
+      Component {
+          id: iconVisual
+
+          Text {
+              anchors.fill: parent
+              horizontalAlignment: Text.AlignHCenter
+              verticalAlignment: Text.AlignVCenter
+
+              text: root.icon
+              color: root.finalTextColor
+
+              font {
+                  pixelSize: 16
+                  family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+              }
+          }
+      }
+
+      Component {
+          id: imageVisual
+
+          Image {
+              anchors.fill: parent
+
+              source: root.imageSource
+              sourceSize.width: root.visualSize
+              sourceSize.height: root.visualSize
+
+              fillMode: Image.PreserveAspectFit
+              smooth: true
+              mipmap: true
+
+              layer.enabled: true
+              layer.effect: ColorOverlay {
+                  color: root.finalTextColor
+              }
+          }
         }
-
         Behavior on scale {
             NumberAnimation {
                 duration: 100

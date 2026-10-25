@@ -260,7 +260,7 @@ RowLayout {
 BtnRound {
     id: wallpaperBtn
     t: theme
-    icon: ""
+    imageSource: Qt.resolvedUrl("../svg/picture.svg")
     hasBorder: true
     showShadow: true
     scale: 0.82
@@ -278,7 +278,7 @@ BtnRound {
 BtnRound {
     id: powerBtn
     t: theme
-    icon: "⏻"
+    imageSource: Qt.resolvedUrl("../svg/power.svg")
     hasBorder: true
     showShadow: true
     activeState: PanelState.panelOpen && PanelState.currentPage === "main"

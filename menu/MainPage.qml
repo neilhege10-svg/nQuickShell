@@ -49,13 +49,34 @@ Item {
             }
         }
 
-        // Bottom half
-        StatsBlock {
-            t: root.t
+        // Bottom half: System gauges + Quick toggles
+        RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 0
             Layout.preferredHeight: 1
+
+            spacing: 12
+
+            StatsBlock {
+                t: root.t
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.minimumWidth: 0
+                Layout.minimumHeight: 0
+                Layout.preferredWidth: 2
+            }
+
+            QuickToggleBlock {
+                t: root.t
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.minimumWidth: 0
+                Layout.minimumHeight: 0
+                Layout.preferredWidth: 1
+            }
         }
     }
 

@@ -52,6 +52,15 @@ Item {
     }
     clip: true
 
+    // A page switch fades the shell shape independently from the NavPill.
+    // The opening/closing sequences still control opacity directly.
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 220
+            easing.type: Easing.InOutCubic
+        }
+    }
+
     Component.onCompleted: {
         width = seedSize
         height = seedSize

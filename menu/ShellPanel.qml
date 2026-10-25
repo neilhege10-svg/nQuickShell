@@ -91,15 +91,6 @@ PanelWindow {
     Item {
         anchors.fill: panelShape
         anchors.margins: 16
-        opacity: panelShape.readyForContent && !pageSwitching ? 1 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 250
-                easing.type: Easing.InOutCubic
-            }
-        }
-
         Loader {
             id: pageLoader
 
@@ -114,11 +105,11 @@ PanelWindow {
             sourceComponent: root.displayedPage === "wallpaper"
                              ? wallpaperPage : mainPage
 
-            opacity: 1
+            opacity: panelShape.readyForContent && !root.pageSwitching ? 1 : 0
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 250
+                    duration: 350
                     easing.type: Easing.InOutCubic
                 }
             }
@@ -128,9 +119,20 @@ PanelWindow {
             id: navPill
 
             t: theme
+            displayedPage: root.displayedPage
+            contextOpacity: root.pageSwitching ? 0 : 1
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+
+              opacity: panelShape.readyForContent ? 1 : 0
+
+              Behavior on opacity {
+                  NumberAnimation {
+                      duration: 250
+                      easing.type: Easing.InOutCubic
+                  }
+              }
         }
     }
 
@@ -141,7 +143,7 @@ PanelWindow {
     Timer {
         id: pageSwitchTimer
 
-        interval: 260
+        interval: 350
         repeat: false
 
           onTriggered: {
@@ -158,7 +160,6 @@ PanelWindow {
                 return
 
             root.pageSwitching = true
-            pageLoader.opacity = 0
             pageSwitchTimer.restart()
         }
     }
@@ -176,12 +177,11 @@ PanelWindow {
     Timer {
         id: pageSettleTimer
 
-        interval: 100
+        interval: 200
         repeat: false
 
         onTriggered: {
             root.pageSwitching = false
-            pageLoader.opacity = 1
         }
     }
 
