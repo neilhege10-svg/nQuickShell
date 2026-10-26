@@ -65,24 +65,25 @@ read -r disk_pct disk_used_g disk_available_g disk_total_g <<< "$disk_values"
 [[ "${"$"}{disk_pct:-}" =~ ^[0-9]+$ ]] || disk_pct=0
 : "${"$"}{disk_used_g:=0}" "${"$"}{disk_available_g:=0}" "${"$"}{disk_total_g:=0}"
 
-# Disk I/O rate for the physical device backing / (MiB/s).
-# Resolve the root mount's partition to its parent disk to avoid double-counting.
-disk_read=0; disk_write=0; root_source=$(findmnt -n -o SOURCE / 2>/dev/null || true)
-root_name=$(basename "$root_source" | sed 's/\[.*$//')
-root_parent=$(lsblk -ndo PKNAME "$root_source" 2>/dev/null | head -n1 || true)
-disk_name=${"$"}{root_parent:-$root_name}
-if [[ -n "$disk_name" ]]; then
-  disk_now=$(awk -v d="$disk_name" '$3==d {printf "%s %s",$6,$10; exit}' /proc/diskstats)
-  disk_state="${"$"}{TMPDIR:-/tmp}/quickshell-diskstats-${"$"}{UID}-${"$"}{disk_name}"
-  now_disk=$(date +%s%N 2>/dev/null || date +%s000000000)
-  if [[ -n "$disk_now" && -r "$disk_state" ]]; then
-    read -r old_read old_write old_time < "$disk_state" || true
-    read -r cur_read cur_write <<< "$disk_now"
-    disk_read=$(awk -v n="$cur_read" -v o="${"$"}{old_read:-$cur_read}" -v t="$now_disk" -v ot="${"$"}{old_time:-$now_disk}" 'BEGIN{d=(t-ot)/1000000000;if(d<=0)d=1.5;v=(n-o)*512/d/1048576;if(v<0)v=0;printf "%.2f",v}')
-    disk_write=$(awk -v n="$cur_write" -v o="${"$"}{old_write:-$cur_write}" -v t="$now_disk" -v ot="${"$"}{old_time:-$now_disk}" 'BEGIN{d=(t-ot)/1000000000;if(d<=0)d=1.5;v=(n-o)*512/d/1048576;if(v<0)v=0;printf "%.2f",v}')
-  fi
-  if [[ -n "$disk_now" ]]; then read -r cur_read cur_write <<< "$disk_now"; printf '%s %s %s\n' "$cur_read" "$cur_write" "$now_disk" > "$disk_state" 2>/dev/null || true; fi
+# Aggregate disk I/O across all whole disks (MiB/s), not just the root device.
+# lsblk TYPE=disk excludes partitions so each physical/virtual disk is counted once.
+disk_read=0; disk_write=0
+disk_names=$(lsblk -dn -o NAME,TYPE 2>/dev/null | awk '$2=="disk" {print $1}')
+if [[ -z "$disk_names" ]]; then
+  # Fallback for systems without lsblk: use whole block devices from /sys/block,
+  # excluding pseudo-devices and device-mapper/RAID aggregates to avoid double-counting.
+  disk_names=$(for p in /sys/block/*; do n=${"$"}{p##*/}; [[ -e "$p" ]] || continue; [[ "$n" == loop* || "$n" == ram* || "$n" == zram* || "$n" == dm-* || "$n" == md* ]] && continue; printf '%s\n' "$n"; done)
 fi
+disk_now=$(awk -v names="$disk_names" 'BEGIN{n=split(names,a,"\n");for(i=1;i<=n;i++)if(a[i]!="")wanted[a[i]]=1} ($3 in wanted){r+=$6;w+=$10} END{printf "%.0f %.0f",r,w}' /proc/diskstats)
+disk_state="${"$"}{TMPDIR:-/tmp}/quickshell-diskstats-${"$"}{UID}-all"
+now_disk=$(date +%s%N 2>/dev/null || date +%s000000000)
+if [[ -n "$disk_now" && -r "$disk_state" ]]; then
+  read -r old_read old_write old_time < "$disk_state" || true
+  read -r cur_read cur_write <<< "$disk_now"
+  disk_read=$(awk -v n="$cur_read" -v o="${"$"}{old_read:-$cur_read}" -v t="$now_disk" -v ot="${"$"}{old_time:-$now_disk}" 'BEGIN{d=(t-ot)/1000000000;if(d<=0)d=1.5;v=(n-o)*512/d/1048576;if(v<0)v=0;printf "%.2f",v}')
+  disk_write=$(awk -v n="$cur_write" -v o="${"$"}{old_write:-$cur_write}" -v t="$now_disk" -v ot="${"$"}{old_time:-$now_disk}" 'BEGIN{d=(t-ot)/1000000000;if(d<=0)d=1.5;v=(n-o)*512/d/1048576;if(v<0)v=0;printf "%.2f",v}')
+fi
+if [[ -n "$disk_now" ]]; then read -r cur_read cur_write <<< "$disk_now"; printf '%s %s %s\n' "$cur_read" "$cur_write" "$now_disk" > "$disk_state" 2>/dev/null || true; fi
 
 # Select the first non-loopback interface with a sysfs device; rate uses a small state file.
 rx=0; tx=0; iface=""
