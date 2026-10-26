@@ -24,7 +24,7 @@ QtObject {
             height: 495
         },
         "main": {
-          width: 1000,
+          width: 1050,
             height: 550
         }
     })

@@ -31,7 +31,7 @@ Rectangle {
 
         // CPU: large utilization ring + temperature bar.
         ColumnLayout {
-            Layout.preferredWidth: root.width * 0.30
+            Layout.preferredWidth: root.width * (1.10 / 4.30)
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 0
@@ -69,7 +69,7 @@ Rectangle {
 
         // GPU: same visual language as CPU, with its own accent treatment.
         ColumnLayout {
-            Layout.preferredWidth: root.width * 0.30
+            Layout.preferredWidth: root.width * (1.10 / 4.30)
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 0
@@ -107,7 +107,7 @@ Rectangle {
 
         // Memory: no nested card background, only spacing and a divider.
         ColumnLayout {
-            Layout.preferredWidth: root.width * 0.18
+            Layout.preferredWidth: root.width * (1.05 / 4.30)
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 0
@@ -165,7 +165,7 @@ Rectangle {
 
         // Resource details: simple bars, no nested panel/card backgrounds.
         ColumnLayout {
-            Layout.preferredWidth: root.width * 0.18
+            Layout.preferredWidth: root.width * (1.05 / 4.30)
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 0
@@ -179,14 +179,42 @@ Rectangle {
                 font.pixelSize: 10
             }
 
-            HorizontalGauge {
+            ColumnLayout {
                 Layout.fillWidth: true
-                label: "SWAP"
-                value: root.safePercent(root.stats.swapUsedPercent)
-                valueLabel: root.stats.swapTotalGiB <= 0 ? "N/A" : root.stats.swapUsedPercent.toFixed(0) + "%"
-                detail: root.stats.swapTotalGiB <= 0 ? "No swap configured" : root.stats.swapUsedPercent.toFixed(0) + "% used"
-                t: root.t
-                accent: root.t ? root.t.base.accent : "#03befc"
+                spacing: 5
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        text: "DISK I/O"
+                        color: root.t ? root.t.base.textInactive : "#6e6e6e"
+                        font.family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+                        font.pixelSize: 10
+                    }
+                    Item { Layout.fillWidth: true }
+                    Text {
+                        text: "MiB/s"
+                        color: root.t ? root.t.base.textInactive : "#6e6e6e"
+                        font.family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+                        font.pixelSize: 9
+                    }
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        text: "R  " + root.stats.diskReadMiBs.toFixed(1)
+                        color: root.t ? root.t.base.text : "#e6e6e6"
+                        font.family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+                        font.pixelSize: 11
+                    }
+                    Item { Layout.fillWidth: true }
+                    Text {
+                        text: "W  " + root.stats.diskWriteMiBs.toFixed(1)
+                        color: root.t ? root.t.holo.text : "#03befc"
+                        font.family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
+                        font.pixelSize: 11
+                    }
+                }
             }
 
             HorizontalGauge {
@@ -194,7 +222,7 @@ Rectangle {
                 label: "DISK"
                 value: root.safePercent(root.stats.diskUsedPercent)
                 valueLabel: root.stats.diskUsedPercent.toFixed(0) + "%"
-                detail: root.stats.diskUsedPercent.toFixed(0) + "% used"
+                detail: root.stats.diskUsedGiB.toFixed(0) + " GB used · " + root.stats.diskAvailableGiB.toFixed(0) + " GB free"
                 t: root.t
                 accent: root.t ? root.t.holo.text : "#9a8cff"
             }
