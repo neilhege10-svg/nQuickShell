@@ -10,6 +10,8 @@ ColumnLayout {
     property color accent: "#03befc"
     property var t
     property bool showDetail: true
+    // Optional replacement for the default percentage label (e.g. "54°C" or "N/A").
+    property string valueLabel: ""
 
     spacing: 5
 
@@ -27,7 +29,7 @@ ColumnLayout {
         }
 
         Text {
-            text: Math.round(Math.max(0, Math.min(100, root.value))) + "%"
+            text: root.valueLabel !== "" ? root.valueLabel : Math.round(Math.max(0, Math.min(100, root.value))) + "%"
             color: root.t ? root.t.base.textInactive : "#6e6e6e"
             font.family: root.t ? root.t.fontFamily : "JetBrainsMono Nerd Font"
             font.pixelSize: 10

@@ -17,7 +17,8 @@ QtObject {
     property real vramUsedPercent: -1
     property real vramUsedGiB: -1
     property real vramTotalGiB: -1
-    property real swapUsedPercent: 0
+    property real swapUsedPercent: -1
+    property real swapTotalGiB: 0
     property real diskUsedPercent: 0
     property real networkRxMiBs: 0
     property real networkTxMiBs: 0
@@ -46,10 +47,12 @@ mem_values=$(awk '
   /^MemTotal:/ {mt=$2} /^MemAvailable:/ {ma=$2} /^SwapTotal:/ {st=$2} /^SwapFree:/ {sf=$2}
   END {printf "%d %d %d %d\n", mt-ma, mt, st-sf, st} ' /proc/meminfo)
 read -r ram_used ram_total swap_used swap_total <<< "$mem_values"
-ram_pct=$(awk -v u="$ram_used" -v t="$ram_total" 'BEGIN{printf "%.1f",t>0?100*u/t:0}')
+ram_pct=$(awk -v u="$ram_used" -v t="$ram_total" 'BEGIN{printf "%.1f", (t>0 ? 100*u/t : 0)}')
 ram_used_g=$(awk -v n="$ram_used" 'BEGIN{printf "%.2f",n/1048576}')
 ram_total_g=$(awk -v n="$ram_total" 'BEGIN{printf "%.2f",n/1048576}')
-swap_pct=$(awk -v u="$swap_used" -v t="$swap_total" 'BEGIN{printf "%.1f",t>0?100*u/t:0}')
+swap_pct=-1
+if (( swap_total > 0 )); then swap_pct=$(awk -v u="$swap_used" -v t="$swap_total" 'BEGIN{printf "%.1f",100*u/t}'); fi
+swap_total_g=$(awk -v n="$swap_total" 'BEGIN{printf "%.2f",n/1048576}')
 
 # Root filesystem usage.
 disk_pct=$(df -P / 2>/dev/null | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
@@ -57,12 +60,15 @@ disk_pct=$(df -P / 2>/dev/null | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
 
 # Select the first non-loopback interface with a sysfs device; rate uses a small state file.
 rx=0; tx=0; iface=""
+# Prefer an interface that is actually operational, not merely present.
 for p in /sys/class/net/*; do
   [[ -e "$p" ]] || continue
   n=${"$"}{p##*/}; [[ "$n" == lo ]] && continue
-  [[ -e "$p/device" ]] || continue
-  iface=$n; break
+  oper=$(cat "$p/operstate" 2>/dev/null || true)
+  carrier=$(cat "$p/carrier" 2>/dev/null || true)
+  if [[ "$oper" == up && ( "$carrier" == 1 || ! -e "$p/carrier" ) ]]; then iface=$n; break; fi
 done
+# Fallback to any non-loopback interface if none reports operational state.
 if [[ -z "$iface" ]]; then
   for p in /sys/class/net/*; do n=${"$"}{p##*/}; [[ "$n" == lo ]] && continue; iface=$n; break; done
 fi
@@ -111,7 +117,7 @@ done
 if (( vram_used >= 0 )); then vram_used_g=$(awk -v n="$vram_used" 'BEGIN{printf "%.2f",n/1073741824}'); else vram_used_g=-1; fi
 if (( vram_total > 0 )); then
   vram_total_g=$(awk -v n="$vram_total" 'BEGIN{printf "%.2f",n/1073741824}')
-  vram_pct=$(awk -v u="$vram_used" -v t="$vram_total" 'BEGIN{printf "%.1f",100*u/t}')
+  vram_pct=$(awk -v u="$vram_used" -v t="$vram_total" 'BEGIN{printf "%.1f", (t>0 ? 100*u/t : 0)}')
 else vram_total_g=-1; vram_pct=-1; fi
 
 # CPU temperature: scan hwmon labels, prefer packages/Tctl/Tdie, fallback to first valid temp.
@@ -144,6 +150,7 @@ printf 'ramUsedPercent=%s\n' "$ram_pct"
 printf 'ramUsedGiB=%s\n' "$ram_used_g"
 printf 'ramTotalGiB=%s\n' "$ram_total_g"
 printf 'swapUsedPercent=%s\n' "$swap_pct"
+printf 'swapTotalGiB=%s\n' "$swap_total_g"
 printf 'diskUsedPercent=%s\n' "$disk_pct"
 printf 'networkRxMiBs=%s\n' "$rx"
 printf 'networkTxMiBs=%s\n' "$tx"
@@ -173,6 +180,7 @@ printf 'vramTotalGiB=%s\n' "$vram_total_g"
                 case "ramUsedGiB": root.ramUsedGiB = n; break
                 case "ramTotalGiB": root.ramTotalGiB = n; break
                 case "swapUsedPercent": root.swapUsedPercent = n; break
+                case "swapTotalGiB": root.swapTotalGiB = n; break
                 case "diskUsedPercent": root.diskUsedPercent = n; break
                 case "networkRxMiBs": root.networkRxMiBs = n; break
                 case "networkTxMiBs": root.networkTxMiBs = n; break

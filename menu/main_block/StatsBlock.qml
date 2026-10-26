@@ -53,7 +53,8 @@ Rectangle {
                 Layout.fillWidth: true
                 label: "TEMP"
                 value: root.safePercent(root.stats.cpuTempC)
-                detail: root.tempDetail(root.stats.cpuTempC)
+                valueLabel: root.tempDetail(root.stats.cpuTempC)
+                detail: ""
                 showDetail: false
                 t: root.t
                 accent: root.t ? root.t.base.accent : "#03befc"
@@ -90,7 +91,8 @@ Rectangle {
                 Layout.fillWidth: true
                 label: "TEMP"
                 value: root.safePercent(root.stats.gpuTempC)
-                detail: root.tempDetail(root.stats.gpuTempC)
+                valueLabel: root.tempDetail(root.stats.gpuTempC)
+                detail: ""
                 showDetail: false
                 t: root.t
                 accent: root.t ? root.t.holo.text : "#9a8cff"
@@ -181,7 +183,8 @@ Rectangle {
                 Layout.fillWidth: true
                 label: "SWAP"
                 value: root.safePercent(root.stats.swapUsedPercent)
-                detail: root.stats.swapUsedPercent.toFixed(0) + "% used"
+                valueLabel: root.stats.swapTotalGiB <= 0 ? "N/A" : root.stats.swapUsedPercent.toFixed(0) + "%"
+                detail: root.stats.swapTotalGiB <= 0 ? "No swap configured" : root.stats.swapUsedPercent.toFixed(0) + "% used"
                 t: root.t
                 accent: root.t ? root.t.base.accent : "#03befc"
             }
@@ -190,6 +193,7 @@ Rectangle {
                 Layout.fillWidth: true
                 label: "DISK"
                 value: root.safePercent(root.stats.diskUsedPercent)
+                valueLabel: root.stats.diskUsedPercent.toFixed(0) + "%"
                 detail: root.stats.diskUsedPercent.toFixed(0) + "% used"
                 t: root.t
                 accent: root.t ? root.t.holo.text : "#9a8cff"
