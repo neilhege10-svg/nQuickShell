@@ -25,7 +25,7 @@ QtObject {
         },
         "main": {
           width: 1000,
-            height: 495
+            height: 550
         }
     })
     readonly property var defaultSize: ({

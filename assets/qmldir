@@ -5,3 +5,5 @@ HudListHeader 1.0 HudListHeader.qml
 ToggleSwitch 1.0 ToggleSwitch.qml
 ScrollHudList 1.0 ScrollHudList.qml
 ActionTile 1.0 ActionTile.qml
+HorizontalGauge 1.0 HorizontalGauge.qml
+CircularGauge 1.0 CircularGauge.qml

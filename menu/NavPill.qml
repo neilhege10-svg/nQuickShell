@@ -87,8 +87,9 @@ Rectangle {
             border.width: 1
             border.color: root.t ? root.t.base.border : "#454545"
 
-            visible: root.displayedPage === "wallpaper"
-            opacity: root.contextOpacity
+            visible: root.displayedPage === "wallpaper" || opacity > 0
+            opacity: root.displayedPage === "wallpaper"
+                    ? root.contextOpacity : 0
 
             Behavior on opacity {
                 NumberAnimation {
@@ -131,8 +132,9 @@ Rectangle {
             spacing: 6
             Layout.alignment: Qt.AlignVCenter
 
-            visible: root.displayedPage === "wallpaper"
-            opacity: root.contextOpacity
+            visible: root.displayedPage === "wallpaper" || opacity > 0
+            opacity: root.displayedPage === "wallpaper"
+                    ? root.contextOpacity : 0
 
             Behavior on opacity {
                 NumberAnimation {
@@ -312,8 +314,15 @@ Rectangle {
             Layout.topMargin: 5
             Layout.bottomMargin: 5
             color: root.t ? root.t.base.border : "#5d6170"
-            opacity: 0.45
-            visible: root.displayedPage === "main"
+            opacity: root.displayedPage === "main" ? 0.45 : 0
+            visible: root.displayedPage === "main" || opacity > 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 220
+                    easing.type: Easing.InOutCubic
+                }
+            }
         }
 
         // ── RIGHT-SIDE PLACEHOLDER ACTIONS ───────
@@ -321,7 +330,16 @@ Rectangle {
             spacing: 4
             Layout.alignment: Qt.AlignVCenter
 
-            visible: root.displayedPage === "main"
+            visible: root.displayedPage === "main" || opacity > 0
+            opacity: root.displayedPage === "main"
+                    ? root.contextOpacity : 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 220
+                    easing.type: Easing.InOutCubic
+                }
+            }
 
             BtnRound {
                 t: root.t
