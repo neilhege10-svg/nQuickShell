@@ -227,10 +227,10 @@ Rectangle {
                         id: logoutIcon
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: 28
-                        height: 28
+                        height: 38
                         source: Qt.resolvedUrl("../../svg/square-arrow-right-exit.svg")
                         sourceSize.width: 28
-                        sourceSize.height: 28
+                        sourceSize.height: 38
                         fillMode: Image.PreserveAspectFit
                         smooth: true
                         mipmap: true

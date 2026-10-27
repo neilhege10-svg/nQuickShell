@@ -26,15 +26,14 @@ Rectangle {
 
     radius: 9
 
-    // Subtle physical feedback shared by SessionBlock and other ActionTile users.
-    y: mouseArea.pressed ? 1 : 0
+// Tactile feedback without interfering with layout positioning.
     scale: mouseArea.pressed ? 0.975 : 1.0
 
-    Behavior on y {
-        NumberAnimation { duration: 70; easing.type: Easing.OutQuad }
-    }
     Behavior on scale {
-        NumberAnimation { duration: 70; easing.type: Easing.OutQuad }
+      NumberAnimation {
+          duration: 70
+          easing.type: Easing.OutQuad
+      }
     }
 
 // Behaviour for when the mouse hovers over the button
