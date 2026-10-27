@@ -131,60 +131,134 @@ Rectangle {
 // it uses ActionTile.qml from the Assets folder
 // and the onClicked properties are pulled from SessionService.qml
 // -----------------------------------
-        GridLayout {
+        RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 8
 
-            columns: 2
-            columnSpacing: 8
-            rowSpacing: 8
-
-            ActionTile {
+            // Existing four actions keep their familiar 2x2 arrangement.
+            GridLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: 48
+                Layout.minimumWidth: 0
 
-                t: root.t
-                iconSource: Qt.resolvedUrl("../../svg/power.svg")
-                label: "Power Off"
+                columns: 2
+                columnSpacing: 8
+                rowSpacing: 8
 
-                onClicked: SessionService.requestConfirmation("poweroff")
+                ActionTile {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 48
+                    t: root.t
+                    iconSource: Qt.resolvedUrl("../../svg/power.svg")
+                    label: "Power Off"
+                    onClicked: SessionService.requestConfirmation("poweroff")
+                }
+
+                ActionTile {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 48
+                    t: root.t
+                    iconSource: Qt.resolvedUrl("../../svg/rotate-ccw.svg")
+                    label: "Restart"
+                    onClicked: SessionService.requestConfirmation("reboot")
+                }
+
+                ActionTile {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 48
+                    t: root.t
+                    iconSource: Qt.resolvedUrl("../../svg/moon.svg")
+                    label: "Suspend"
+                    onClicked: SessionService.suspend()
+                }
+
+                ActionTile {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 48
+                    t: root.t
+                    iconSource: Qt.resolvedUrl("../../svg/lock.svg")
+                    label: "Lock Screen"
+                    onClicked: SessionService.lock()
+                }
             }
 
-            ActionTile {
-                Layout.fillWidth: true
+            // Dedicated logout tile: wider than the old ActionTile version,
+            // with a quieter treatment so it feels distinct from the four main actions.
+            Rectangle {
+                id: logoutTile
+                Layout.preferredWidth: 86
+                Layout.minimumWidth: 86
+                Layout.maximumWidth: 112
                 Layout.fillHeight: true
                 Layout.minimumHeight: 48
 
-                t: root.t
-                iconSource: Qt.resolvedUrl("../../svg/rotate-ccw.svg")
-                label: "Restart"
+                radius: 9
+                readonly property color tileColor:
+                    root.t ? root.t.holo.holobg : "#1a3e78d6"
+                readonly property color tileHover:
+                    root.t ? root.t.holo.neonActive : "#a603cffc"
+                readonly property color tileBorder:
+                    root.t ? root.t.holo.neon : "#5903cffc"
 
-                onClicked: SessionService.requestConfirmation("reboot")
-            }
+                color: logoutMouse.containsMouse ? tileHover : tileColor
+                border.color: logoutMouse.containsMouse
+                    ? (root.t ? root.t.base.accent : "#03befc")
+                    : tileBorder
+                border.width: 1
 
-            ActionTile {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumHeight: 48
+                Behavior on color {
+                    ColorAnimation { duration: 140 }
+                }
+                Behavior on border.color {
+                    ColorAnimation { duration: 140 }
+                }
 
-                t: root.t
-                iconSource: Qt.resolvedUrl("../../svg/moon.svg")
-                label: "Suspend"
+                Column {
+                    anchors.centerIn: parent
+                    width: parent.width - 12
+                    spacing: 8
 
-                onClicked: SessionService.suspend()
-            }
+                    Image {
+                        id: logoutIcon
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: 28
+                        height: 28
+                        source: Qt.resolvedUrl("../../svg/square-arrow-right-exit.svg")
+                        sourceSize.width: 28
+                        sourceSize.height: 28
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true
+                        mipmap: true
 
-            ActionTile {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumHeight: 48
+                        layer.enabled: true
+                        layer.effect: ColorOverlay {
+                            color: root.accent
+                        }
+                    }
 
-                t: root.t
-                iconSource: Qt.resolvedUrl("../../svg/lock.svg")
-                label: "Lock Screen"
+                    Text {
+                        width: parent.width
+                        text: "Log Out"
+                        color: root.primaryText
+                        font.family: root.uiFont
+                        font.pixelSize: 10
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                    }
+                }
 
-                onClicked: SessionService.lock()
+                MouseArea {
+                    id: logoutMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: SessionService.logout()
+                }
             }
         }
     }

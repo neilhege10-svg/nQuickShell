@@ -2,11 +2,8 @@ import QtQuick
 import Quickshell.Services.Pipewire
 pragma Singleton
 
-QtObject {
-    /* keep the default sink alive and updated
-    PwObjectTracker {
-        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
-      } */
+Item {
+  visible: false
 
     id: root
 
@@ -22,6 +19,14 @@ QtObject {
     readonly property real inputVolume: inputNode && inputNode.audio ? inputNode.audio.volume : 0
     readonly property bool inputMuted: inputNode && inputNode.audio ? inputNode.audio.muted : false
     readonly property string inputName: inputNode ? inputNode.description : "No input"
+
+      PwObjectTracker {
+          objects: [
+              Pipewire.defaultAudioSink,
+              Pipewire.defaultAudioSource
+          ]
+      }
+
     // ── DEVICE LISTS ────────────────────
     // output devices — hardware sinks only, not app streams
     readonly property var outputDevices: {
@@ -49,6 +54,25 @@ QtObject {
         if (inputNode && inputNode.audio)
             inputNode.audio.volume = Math.max(0, Math.min(1, v));
 
+              function setInputVolume(v) {
+                console.log("MIC VOLUME REQUEST:", v)
+                console.log("INPUT NODE:", inputNode)
+                console.log("INPUT AUDIO:", inputNode ? inputNode.audio : null)
+
+                if (inputNode && inputNode.audio)
+                inputNode.audio.volume = Math.max(0, Math.min(1, v))
+              }
+    
+
+function toggleInputMute() {
+    console.log("MIC MUTE REQUEST")
+    console.log("INPUT NODE:", inputNode)
+    console.log("INPUT AUDIO:", inputNode ? inputNode.audio : null)
+
+    if (inputNode && inputNode.audio)
+        inputNode.audio.muted = !inputNode.audio.muted
+}
+
     }
 
     function toggleOutputMute() {
@@ -61,6 +85,14 @@ QtObject {
         if (inputNode && inputNode.audio)
             inputNode.audio.muted = !inputNode.audio.muted;
 
+                function toggleInputMute() {
+                    console.log("MIC MUTE REQUEST")
+                    console.log("INPUT NODE:", inputNode)
+                    console.log("INPUT AUDIO:", inputNode ? inputNode.audio : null)
+
+                    if (inputNode && inputNode.audio)
+                        inputNode.audio.muted = !inputNode.audio.muted
+                }
     }
 
     function setOutputDevice(node) {

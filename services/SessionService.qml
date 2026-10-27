@@ -65,11 +65,23 @@ Item {
         }
     }
 
+    Process {
+        id: logoutProcess
+        command: ["sh", "-c", 'if [ -n "$XDG_SESSION_ID" ]; then exec loginctl terminate-session "$XDG_SESSION_ID"; else echo "XDG_SESSION_ID is not set; cannot safely identify the current session" >&2; exit 1; fi']
+
+        onExited: (exitCode, exitStatus) => {
+            running = false
+            if (exitCode !== 0)
+                root.actionFailed("logout", exitCode)
+        }
+    }
+
     function requestConfirmation(action) {
         if (poweroffProcess.running ||
             rebootProcess.running ||
             suspendProcess.running ||
-            lockProcess.running)
+            lockProcess.running ||
+            logoutProcess.running)
             return
 
         if (action !== "poweroff" && action !== "reboot")
@@ -111,7 +123,17 @@ Item {
         if (!poweroffProcess.running &&
             !rebootProcess.running &&
             !suspendProcess.running &&
-            !lockProcess.running)
+            !lockProcess.running &&
+            !logoutProcess.running)
             lockProcess.running = true
+    }
+
+    function logout() {
+        if (!poweroffProcess.running &&
+            !rebootProcess.running &&
+            !suspendProcess.running &&
+            !lockProcess.running &&
+            !logoutProcess.running)
+            logoutProcess.running = true
     }
 }

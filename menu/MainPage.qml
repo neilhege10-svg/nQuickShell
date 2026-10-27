@@ -36,48 +36,44 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 0
-                Layout.preferredHeight: 1
+                Layout.preferredWidth: 1.15
             }
 
-            AudioBlock {
-                t: root.t
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumWidth: 0
-                Layout.minimumHeight: 0
-                Layout.preferredWidth: 2
+            QuickToggleBlock {
+              t: root.t
+              Layout.fillWidth: true
+              Layout.fillHeight: true
+              Layout.minimumHeight: 0
+              Layout.preferredWidth: 2
             }
         }
 
-        // Bottom half: System gauges + Quick toggles
-        RowLayout {
+      // Bottom half
+      RowLayout {
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          Layout.minimumHeight: 0
+          spacing: 12
+
+        StatsBlock {
+            t: root.t
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 0
             Layout.preferredHeight: 1
+          }
 
-            spacing: 12
-
-            StatsBlock {
-                t: root.t
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumWidth: 0
-                Layout.minimumHeight: 0
-                Layout.preferredWidth: 2
-            }
-
-            QuickToggleBlock {
-                t: root.t
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumWidth: 0
-                Layout.minimumHeight: 0
-                Layout.preferredWidth: 1
-            }
+        AudioBlock {
+          t: root.t
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          Layout.minimumWidth: 0
+          Layout.minimumHeight: 0
+          Layout.preferredWidth: 0.5
         }
+
+      }
+
     }
 
 // --OVERLAY for SessionBlock.qml------------------------------------------------

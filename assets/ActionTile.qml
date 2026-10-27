@@ -25,8 +25,20 @@ Rectangle {
         t ? t.fontFamily : "JetBrainsMono Nerd Font"
 
     radius: 9
+
+    // Subtle physical feedback shared by SessionBlock and other ActionTile users.
+    y: mouseArea.pressed ? 1 : 0
+    scale: mouseArea.pressed ? 0.975 : 1.0
+
+    Behavior on y {
+        NumberAnimation { duration: 70; easing.type: Easing.OutQuad }
+    }
+    Behavior on scale {
+        NumberAnimation { duration: 70; easing.type: Easing.OutQuad }
+    }
+
 // Behaviour for when the mouse hovers over the button
-    color: mouseArea.containsMouse ? tileHover : tileColor
+    color: mouseArea.pressed ? (t ? t.base.surface : "#151922") : (mouseArea.containsMouse ? tileHover : tileColor)
 
     border.color: mouseArea.containsMouse
         ? (t ? t.base.accent : "#03befc")
