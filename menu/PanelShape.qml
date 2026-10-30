@@ -70,6 +70,10 @@ Item {
     onOpenChanged: {
         readyForContent = false
 
+        // Prevent page resizing and open/close animations from
+        // controlling width and height simultaneously.
+        pageResizeSeq.stop()
+
         if (open) {
             closeSeq.stop()
             openSeq.start()

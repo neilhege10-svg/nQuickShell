@@ -91,6 +91,14 @@ PanelWindow {
     Item {
         anchors.fill: panelShape
         anchors.margins: 16
+
+        focus: PanelState.panelOpen
+
+        Keys.onEscapePressed: (event) => {
+            PanelState.close()
+            event.accepted = true
+        }
+
         Loader {
             id: pageLoader
 
@@ -152,17 +160,33 @@ PanelWindow {
           }
     }
 
-    Connections {
-        target: PanelState
+      Connections {
+          target: PanelState
 
-        function onCurrentPageChanged() {
-            if (!PanelState.panelOpen || !panelShape.readyForContent)
-                return
+          function onCurrentPageChanged() {
+              if (!PanelState.panelOpen || !panelShape.readyForContent)
+                  return
 
-            root.pageSwitching = true
-            pageSwitchTimer.restart()
-        }
-    }
+              // Don't let an older resize settle during a newer page switch.
+              pageSettleTimer.stop()
+              root.pageSwitching = true
+              pageSwitchTimer.restart()
+          }
+
+          function onPanelOpenChanged() {
+              // Closing invalidates every pending page-switch callback.
+              // Reopening starts from the latest requested page.
+              pageSwitchTimer.stop()
+              pageSettleTimer.stop()
+
+              if (PanelState.panelOpen) {
+                  root.displayedPage = PanelState.currentPage
+                  root.pageSwitching = false
+              } else {
+                  root.pageSwitching = false
+              }
+          }
+      }
 
     Connections {
         target: panelShape
