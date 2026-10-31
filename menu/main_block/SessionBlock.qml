@@ -35,7 +35,7 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 12
-        spacing: 10
+        spacing: 24
 
         // ── HEADER ──────────────────────────────
         Item {

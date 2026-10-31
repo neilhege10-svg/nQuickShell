@@ -39,7 +39,7 @@ Item {
                 Layout.preferredWidth: 1.15
             }
 
-            QuickToggleBlock {
+            SettingsBlock {
               t: root.t
               Layout.fillWidth: true
               Layout.fillHeight: true
